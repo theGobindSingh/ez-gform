@@ -1,5 +1,5 @@
-import type { FormSchema } from "@ez-gform/core";
 import { parseFormData } from "@ez-gform/core";
+import type { FormSchema } from "@ez-gform/types";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 

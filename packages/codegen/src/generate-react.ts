@@ -1,14 +1,12 @@
-import type { FormSchema, Question, Section } from "@ez-gform/core";
+import type {
+  FormSchema,
+  GenerateReactOptions,
+  Question,
+  Section,
+} from "@ez-gform/types";
 import { toPascalCase } from "./names.js";
 
-export interface GenerateReactComponentOptions {
-  /** Component name. Defaults to a PascalCase form of `schema.title` + `Form`. */
-  name?: string;
-  /** Emit TypeScript (`.tsx`) vs. plain JS-in-JSX. Defaults to `true`. */
-  typescript?: boolean;
-  /** Reserved for future styling presets. Only `"none"` is currently supported. */
-  styling?: "none";
-}
+export type GenerateReactComponentOptions = GenerateReactOptions;
 
 const JSX_TEXT_ESCAPES: Record<string, string> = {
   "&": "&amp;",

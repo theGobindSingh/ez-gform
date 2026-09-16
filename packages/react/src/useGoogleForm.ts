@@ -1,10 +1,10 @@
+import { buildPrefillUrl, submitForm, validateValues } from "@ez-gform/core";
 import type {
   FieldValue,
   FormSchema,
   FormValues,
   SubmitResult,
-} from "@ez-gform/core";
-import { buildPrefillUrl, submitForm, validateValues } from "@ez-gform/core";
+} from "@ez-gform/types";
 import type { ChangeEvent } from "react";
 import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
 

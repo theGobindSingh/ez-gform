@@ -28,7 +28,8 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@ez-gform/core": "workspace:*"
+    "@ez-gform/core": "workspace:*",
+    "@ez-gform/types": "workspace:*"
   },
   "devDependencies": {
     "@ez-gform/tsconfig": "workspace:*",

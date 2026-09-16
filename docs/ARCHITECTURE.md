@@ -18,8 +18,10 @@ fast across four+ packages.
 ```
 ez-gform/
 ├── packages/
+│   ├── types/           # @ez-gform/types
 │   ├── core/          # @ez-gform/core
 │   ├── react/          # @ez-gform/react
+│   ├── codegen/       # @ez-gform/codegen
 │   ├── cli/             # @ez-gform/cli
 │   ├── extension/     # @ez-gform/extension
 │   ├── docs/            # @ez-gform/docs
@@ -33,6 +35,21 @@ ez-gform/
 ├── .prettierrc
 └── .changeset/
 ```
+
+## `packages/types` — `@ez-gform/types`
+
+A type-only package (no runtime code) holding the shared TypeScript types
+every other package depends on: the form schema (`FormSchema`, `Question`,
+`Section`, ...), submitted values (`FormValues`, `FieldValue`, `DateValue`,
+`TimeValue`, `OtherValue`), submit/validation results (`SubmitResult`,
+`SubmitOptions`, `ValidationResult`), the codegen generators' option types,
+and the message contracts the upcoming boilerplate-style `extension` popup
+and content script will exchange (`ExtensionMessage`, `StoredSettings`).
+Centralizing these avoids the exact class of drift a single source-of-truth
+schema type was meant to prevent (see "Monorepo" above) — `core`, `react`,
+`codegen`, and `cli` all `import type` from here and re-export what they
+already exported, so this is purely an internal move with no public API
+change.
 
 ## `packages/core` — `@ez-gform/core`
 
@@ -78,11 +95,23 @@ instead of three independently-drifting implementations.
   legacy per-call DOM `querySelector` reads (fixing the unescaped-selector
   crash, gap-analysis `core` #3).
 
+## `packages/codegen` — `@ez-gform/codegen`
+
+Pure, framework-neutral code generators that turn a parsed `FormSchema`
+into paste-ready output: `generateSchemaJson`, `generateTypes` (a `const
+... satisfies FormSchema` plus a companion `Values` type), `generateReactComponent`
+(a controlled React form component), and `generateHtmlForm` (a plain HTML
+`<form>` with the correct `entry.NNN` `name` attributes). No I/O of its
+own — `packages/cli` and, eventually, the extension's popup are the two
+callers that fetch/parse a form and hand the resulting schema to these
+generators. Kept separate from `packages/core` so `core` can stay
+templating-free and zero-runtime-dependency.
+
 ## `packages/cli` — `@ez-gform/cli`
 
 An `npx` tool: given a public form URL, fetches it, runs it through
-`@ez-gform/core`'s parser, and emits a JSON schema, TypeScript types, or a
-scaffolded React component. This directly replaces the legacy extension's
+`@ez-gform/core`'s parser, and `@ez-gform/codegen`'s generators to emit a
+JSON schema, TypeScript types, or a scaffolded React component. This directly replaces the legacy extension's
 "generate paste-ready code" role for anyone who'd rather run a CLI than
 install a browser extension, and gives `packages/docs`' walkthrough a
 non-extension path for obtaining `entry.*` ids — the single biggest

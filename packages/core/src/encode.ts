@@ -5,7 +5,9 @@ import type {
   FormValues,
   OtherValue,
   TimeValue,
-} from "./types.js";
+  ValidationIssue,
+  ValidationResult,
+} from "@ez-gform/types";
 
 const OTHER_SENTINEL = "__other_option__";
 
@@ -157,18 +159,12 @@ const encodeOne = (
   appendGridMap(params, value);
 };
 
-export interface ValidationResult {
-  ok: boolean;
-  errors?: { entryId: string; message: string }[];
-}
-
 /** Validates `values` against a parsed `FormSchema`: unknown entry ids and missing required questions. */
 export function validateValues(
   values: FormValues,
   schema: FormSchema,
-):
-  { ok: true } | { ok: false; errors: { entryId: string; message: string }[] } {
-  const errors: { entryId: string; message: string }[] = [];
+): ValidationResult {
+  const errors: ValidationIssue[] = [];
 
   const knownEntryIds = new Set<string>();
   for (const q of schema.questions) {

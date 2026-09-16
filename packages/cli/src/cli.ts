@@ -4,7 +4,6 @@ import {
   generateSchemaJson,
   generateTypes,
 } from "@ez-gform/codegen";
-import type { FormSchema, FormValues } from "@ez-gform/core";
 import {
   formUrls,
   normalizeFormId,
@@ -13,6 +12,7 @@ import {
   submitForm,
   validateValues,
 } from "@ez-gform/core";
+import type { FormSchema, FormValues } from "@ez-gform/types";
 import { readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";

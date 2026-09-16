@@ -5,6 +5,10 @@
       "path": ".",
     },
     {
+      "name": "📦 @ez-gform/types",
+      "path": "packages/types",
+    },
+    {
       "name": "📦 @ez-gform/core",
       "path": "packages/core",
     },

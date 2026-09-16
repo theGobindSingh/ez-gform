@@ -1,5 +1,5 @@
-import type { FieldValue, FormValues, SubmitResult } from "@ez-gform/core";
 import { submitForm } from "@ez-gform/core";
+import type { FieldValue, FormValues, SubmitResult } from "@ez-gform/types";
 import type { FormEvent, RefObject } from "react";
 import { useCallback } from "react";
 

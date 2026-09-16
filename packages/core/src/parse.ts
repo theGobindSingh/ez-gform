@@ -1,5 +1,3 @@
-import { ParseError } from "./errors.js";
-import { extractFbzx, extractPublicLoadData } from "./extract.js";
 import type {
   ChoiceOption,
   FormSchema,
@@ -7,7 +5,9 @@ import type {
   Question,
   QuestionType,
   Section,
-} from "./types.js";
+} from "@ez-gform/types";
+import { ParseError } from "./errors.js";
+import { extractFbzx, extractPublicLoadData } from "./extract.js";
 
 type Json = unknown;
 

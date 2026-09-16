@@ -1,6 +1,6 @@
+import type { FormSchema } from "@ez-gform/types";
 import { describe, expect, it, vi } from "vitest";
 import { buildPrefillUrl, buildSubmitBody, submitForm } from "./submit.js";
-import type { FormSchema } from "./types.js";
 
 const ID = "1FAIpQLSciCcNILfeSdgUavm_GYuCFE_G8InD1YVkIWAiTU_B3-l9AkA";
 

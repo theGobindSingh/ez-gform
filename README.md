@@ -10,8 +10,10 @@ Form field IDs, a browser extension to help you inspect forms, and the project d
 
 | Package               | Description                                                               |
 | --------------------- | ------------------------------------------------------------------------- |
+| `@ez-gform/types`     | Shared TypeScript types (schema, values, submit, codegen, messages)       |
 | `@ez-gform/core`      | Framework-agnostic core: builds and submits form payloads to Google Forms |
 | `@ez-gform/react`     | React hooks/components built on `@ez-gform/core`                          |
+| `@ez-gform/codegen`   | Pure code generators (JSON schema, TS types, React component, HTML form)  |
 | `@ez-gform/cli`       | CLI to discover Google Form field entry IDs                               |
 | `@ez-gform/extension` | Browser extension to help inspect Google Forms                            |
 | `@ez-gform/docs`      | Documentation site                                                        |

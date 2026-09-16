@@ -1,9 +1,6 @@
-import type { FormSchema } from "@ez-gform/core";
+import type { FormSchema, GenerateSchemaJsonOptions } from "@ez-gform/types";
 
-export interface GenerateSchemaJsonOptions {
-  /** Pretty-print with 2-space indentation. Defaults to `true`. */
-  pretty?: boolean;
-}
+export type { GenerateSchemaJsonOptions } from "@ez-gform/types";
 
 /** Serializes a `FormSchema` back to JSON text. Round-trips structurally with `JSON.parse`. */
 export const generateSchemaJson = (

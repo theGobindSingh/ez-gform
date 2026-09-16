@@ -1,5 +1,5 @@
+import type { FormSchema, FormValues } from "@ez-gform/types";
 import { encodeValues } from "./encode.js";
-import type { FormSchema, FormValues } from "./types.js";
 import { formUrls, normalizeFormId } from "./url.js";
 
 /** Builds a human-facing `/viewform?usp=pp_url&entry.N=...` prefill URL. */

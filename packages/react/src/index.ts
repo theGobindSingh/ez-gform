@@ -4,7 +4,7 @@ export type {
   FormValues,
   Question,
   SubmitResult,
-} from "@ez-gform/core";
+} from "@ez-gform/types";
 
 export { default, useEasyGoogleForm } from "./useEasyGoogleForm.js";
 export type {

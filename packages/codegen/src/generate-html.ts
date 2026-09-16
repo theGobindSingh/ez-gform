@@ -1,5 +1,5 @@
-import type { FormSchema, Question } from "@ez-gform/core";
 import { formUrls } from "@ez-gform/core";
+import type { FormSchema, Question } from "@ez-gform/types";
 
 const escapeHtml = (value: string): string => {
   return value

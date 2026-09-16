@@ -1,7 +1,7 @@
 {
-  "name": "@ez-gform/core",
+  "name": "@ez-gform/types",
   "version": "0.0.0",
-  "description": "Framework-agnostic Google Forms parser, entry encoder, and submitter.",
+  "description": "Shared TypeScript types for the ez-gform packages (form schema, values, submit, codegen, extension messages).",
   "type": "module",
   "license": "MIT",
   "sideEffects": false,
@@ -26,9 +26,6 @@
     "lint:fix": "eslint . --fix",
     "type-check": "tsc --noEmit",
     "clean": "rm -rf dist"
-  },
-  "dependencies": {
-    "@ez-gform/types": "workspace:*"
   },
   "devDependencies": {
     "@ez-gform/tsconfig": "workspace:*",

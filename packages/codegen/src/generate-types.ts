@@ -1,10 +1,11 @@
-import type { FormSchema, Question } from "@ez-gform/core";
+import type {
+  FormSchema,
+  GenerateTypesOptions,
+  Question,
+} from "@ez-gform/types";
 import { toPascalCase } from "./names.js";
 
-export interface GenerateTypesOptions {
-  /** Base name for the generated `const` and `type`. Defaults to a PascalCase form of `schema.title`. */
-  name?: string;
-}
+export type { GenerateTypesOptions } from "@ez-gform/types";
 
 const quote = (value: string): string => {
   return JSON.stringify(value);

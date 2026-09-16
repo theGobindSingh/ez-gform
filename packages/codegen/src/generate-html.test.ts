@@ -1,4 +1,4 @@
-import type { FormSchema, Question } from "@ez-gform/core";
+import type { FormSchema, Question } from "@ez-gform/types";
 import { describe, expect, it } from "vitest";
 import { FIXTURE_SLUGS, loadFixtureSchema } from "./__test-utils__/fixtures.js";
 import { generateHtmlForm } from "./generate-html.js";

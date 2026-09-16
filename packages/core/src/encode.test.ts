@@ -1,6 +1,6 @@
+import type { FormSchema, FormValues } from "@ez-gform/types";
 import { describe, expect, it } from "vitest";
 import { encodeValues, validateValues } from "./encode.js";
-import type { FormSchema, FormValues } from "./types.js";
 
 describe("encodeValues — scalar text/number", () => {
   it("encodes a plain string", () => {
