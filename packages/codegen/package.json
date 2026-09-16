@@ -4,6 +4,22 @@
   "description": "Pure code generators (JSON schema, TS types, React component, HTML form) from a parsed Google Form schema.",
   "type": "module",
   "license": "MIT",
+  "homepage": "https://github.com/theGobindSingh/ez-gform#readme",
+  "bugs": "https://github.com/theGobindSingh/ez-gform/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/theGobindSingh/ez-gform.git",
+    "directory": "packages/codegen"
+  },
+  "keywords": [
+    "google-forms",
+    "ez-gform",
+    "codegen",
+    "code-generator"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "sideEffects": false,
   "exports": {
     ".": {

@@ -38,17 +38,23 @@ Also exported: `extractPublicLoadData`, `parseFormData`, `normalizeFormId`,
 
 ## Encoding table
 
-| Value shape                              | Wire format                                                                                |
-| ---------------------------------------- | ------------------------------------------------------------------------------------------ |
-| `string` / `number`                      | `entry.N=<value>` (empty string is skipped)                                                |
-| `string[]`                               | repeated `entry.N=<value>` (checkboxes)                                                    |
-| `{ other: string }`                      | `entry.N=__other_option__` + `entry.N.other_option_response=<text>`                        |
-| `(string \| { other })[]`                | mix of the two rules above, same `entry.N`                                                 |
-| `{ year?, month, day, hour?, minute? }`  | `entry.N_year` (omitted if `year` undefined) `/_month/_day` (+ `_hour/_minute` if present) |
-| `{ hour, minute }`                       | `entry.N_hour` / `entry.N_minute`, zero-padded to 2 digits                                 |
-| `Record<rowEntryId, string \| string[]>` | each row's own `entry.<rowId>` (grid questions)                                            |
-| `null` / `undefined`                     | skipped                                                                                    |
+| Value shape                              | Wire format                                                                                                                  |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `string` / `number`                      | `entry.N=<value>` (empty string is skipped)                                                                                  |
+| `string[]`                               | repeated `entry.N=<value>` (checkboxes)                                                                                      |
+| `{ other: string }`                      | `entry.N=__other_option__` + `entry.N.other_option_response=<text>`                                                          |
+| `(string \| { other })[]`                | mix of the two rules above, same `entry.N`                                                                                   |
+| `{ year?, month, day, hour?, minute? }`  | `entry.N_year` (omitted if `year` undefined) `/_month/_day` (unpadded) + `_hour/_minute` if present, zero-padded to 2 digits |
+| `{ hour, minute }`                       | `entry.N_hour` / `entry.N_minute`, zero-padded to 2 digits                                                                   |
+| `Record<rowEntryId, string \| string[]>` | each row's own `entry.<rowId>` (grid questions)                                                                              |
+| `null` / `undefined`                     | skipped                                                                                                                      |
 
 `encodeValues` never throws and never hand-encodes strings — it builds a
 native `URLSearchParams`. Pair it with `validateValues(values, schema)` to
 check for unknown entry ids or missing required answers before submitting.
+
+For a grid question, `FormValues` accepts either a nested row map keyed by
+the parent question's `entry.N` (e.g. `{ "entry.1": { "entry.10": "Agree" } }`)
+or the row `entry.<rowId>` ids passed flat at the top level (e.g.
+`{ "entry.10": "Agree" }`) — both encode to the identical `entry.<rowId>=...`
+`URLSearchParams` output.

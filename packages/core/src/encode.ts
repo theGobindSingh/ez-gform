@@ -82,34 +82,18 @@ const appendGridMap = (
 /**
  * Encodes `FormValues` into `entry.NNN`-keyed `URLSearchParams`, per every
  * rule in `docs/research/google-forms-internals.md` §3. Pure: never throws
- * on invalid/unknown data, and never validates against `schema` — pair with
- * `validateValues` for that.
+ * on invalid/unknown data, and never validates against a schema — pair with
+ * `validateValues` for that. The second parameter is accepted (and ignored)
+ * for call-site compatibility with `validateValues(values, schema)`.
  */
 export const encodeValues = (
   values: FormValues,
-  schema?: FormSchema,
+  _?: FormSchema,
 ): URLSearchParams => {
   const params = new URLSearchParams();
-  const checkboxEntryIds = new Set(
-    (schema?.questions ?? [])
-      .filter((q) => {
-        return q.type === "checkboxes";
-      })
-      .map((q) => {
-        return q.entryId;
-      }),
-  );
 
   for (const [entryId, rawValue] of Object.entries(values)) {
     encodeOne(params, entryId, rawValue);
-
-    if (
-      checkboxEntryIds.has(entryId) &&
-      rawValue !== null &&
-      rawValue !== undefined
-    ) {
-      params.append(`${entryId}_sentinel`, "");
-    }
   }
 
   return params;
@@ -143,9 +127,9 @@ const encodeOne = (
     appendScalar(params, `${entryId}_month`, value.month);
     appendScalar(params, `${entryId}_day`, value.day);
     if (value.hour !== undefined)
-      appendScalar(params, `${entryId}_hour`, value.hour);
+      appendScalar(params, `${entryId}_hour`, pad2(value.hour));
     if (value.minute !== undefined)
-      appendScalar(params, `${entryId}_minute`, value.minute);
+      appendScalar(params, `${entryId}_minute`, pad2(value.minute));
     return;
   }
 

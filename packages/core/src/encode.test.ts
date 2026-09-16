@@ -1,6 +1,15 @@
 import type { FormSchema, FormValues } from "@ez-gform/types";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { encodeValues, validateValues } from "./encode.js";
+import { parseFormData } from "./parse.js";
+
+const fixturesDir = fileURLToPath(new URL("./__fixtures__/", import.meta.url));
+
+const loadFixture = (slug: string): unknown => {
+  return JSON.parse(readFileSync(`${fixturesDir}${slug}.json`, "utf8"));
+};
 
 describe("encodeValues — scalar text/number", () => {
   it("encodes a plain string", () => {
@@ -34,6 +43,11 @@ describe("encodeValues — checkbox multi-value (string[])", () => {
   it("repeats the same entry.N", () => {
     const params = encodeValues({ "entry.1": ["A", "B", "C"] });
     expect(params.getAll("entry.1")).toEqual(["A", "B", "C"]);
+  });
+
+  it("emits nothing for an empty checkbox array", () => {
+    const params = encodeValues({ "entry.1": [] });
+    expect([...params.keys()]).toHaveLength(0);
   });
 });
 
@@ -70,12 +84,20 @@ describe("encodeValues — date", () => {
     expect(params.get("entry.1_day")).toBe("16");
   });
 
-  it("includes hour/minute when present", () => {
+  it("does not zero-pad month/day (Google accepts unpadded values)", () => {
     const params = encodeValues({
-      "entry.1": { year: 2026, month: 9, day: 16, hour: 8, minute: 5 },
+      "entry.1": { year: 2026, month: 9, day: 7 },
     });
-    expect(params.get("entry.1_hour")).toBe("8");
-    expect(params.get("entry.1_minute")).toBe("5");
+    expect(params.get("entry.1_month")).toBe("9");
+    expect(params.get("entry.1_day")).toBe("7");
+  });
+
+  it("zero-pads hour/minute when a date value also carries a time, like the TimeValue branch", () => {
+    const params = encodeValues({
+      "entry.1": { year: 2026, month: 9, day: 17, hour: 9, minute: 5 },
+    });
+    expect(params.get("entry.1_hour")).toBe("09");
+    expect(params.get("entry.1_minute")).toBe("05");
   });
 });
 
@@ -90,6 +112,19 @@ describe("encodeValues — time (zero-padded)", () => {
     const params = encodeValues({ "entry.1": { hour: 23, minute: 59 } });
     expect(params.get("entry.1_hour")).toBe("23");
     expect(params.get("entry.1_minute")).toBe("59");
+  });
+
+  it("pads a bare TimeValue the same as a DateValue carrying hour/minute", () => {
+    const timeOnly = encodeValues({ "entry.1": { hour: 9, minute: 5 } });
+    const dateWithTime = encodeValues({
+      "entry.1": { year: 2026, month: 9, day: 17, hour: 9, minute: 5 },
+    });
+    expect(timeOnly.get("entry.1_hour")).toBe("09");
+    expect(timeOnly.get("entry.1_minute")).toBe("05");
+    expect(dateWithTime.get("entry.1_hour")).toBe(timeOnly.get("entry.1_hour"));
+    expect(dateWithTime.get("entry.1_minute")).toBe(
+      timeOnly.get("entry.1_minute"),
+    );
   });
 });
 
@@ -114,42 +149,28 @@ describe("encodeValues — grid row maps", () => {
     const params = encodeValues({ "entry.10": "Agree" });
     expect(params.get("entry.10")).toBe("Agree");
   });
-});
 
-describe("encodeValues — schema-aware checkbox sentinel", () => {
-  const schema: FormSchema = {
-    formId: "abc",
-    title: "t",
-    questions: [
-      {
-        id: "1",
-        entryId: "entry.1",
-        title: "Checkbox Q",
-        type: "checkboxes",
-        required: false,
+  it("encodes a live grid fixture identically via nested row map or flat row ids", () => {
+    const schema = parseFormData(loadFixture("event-feedback"));
+    const grid = schema.questions.find((q) => {
+      return q.title === "How satisfied were you with the following:";
+    });
+    const rows = grid?.rows ?? [];
+    expect(rows.length).toBeGreaterThan(1);
+    const [rowA, rowB] = rows;
+
+    const nested = encodeValues({
+      [grid!.entryId]: {
+        [rowA!.entryId]: "Agree",
+        [rowB!.entryId]: "Disagree",
       },
-      {
-        id: "2",
-        entryId: "entry.2",
-        title: "Text Q",
-        type: "short_answer",
-        required: false,
-      },
-    ],
-    sections: [{ title: "t", questionIds: ["1", "2"] }],
-    multiPage: false,
-  };
+    });
+    const flat = encodeValues({
+      [rowA!.entryId]: "Agree",
+      [rowB!.entryId]: "Disagree",
+    });
 
-  it("adds entry.N_sentinel for checkbox questions present in values, when schema is given", () => {
-    const params = encodeValues({ "entry.1": ["A"], "entry.2": "hi" }, schema);
-    expect(params.has("entry.1_sentinel")).toBe(true);
-    expect(params.get("entry.1_sentinel")).toBe("");
-    expect(params.has("entry.2_sentinel")).toBe(false);
-  });
-
-  it("does not add a sentinel when no schema is given", () => {
-    const params = encodeValues({ "entry.1": ["A"] });
-    expect(params.has("entry.1_sentinel")).toBe(false);
+    expect(nested.toString()).toBe(flat.toString());
   });
 });
 

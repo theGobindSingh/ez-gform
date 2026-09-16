@@ -4,6 +4,23 @@
   "description": "React hooks for submitting to a Google Form without a backend.",
   "type": "module",
   "license": "MIT",
+  "homepage": "https://github.com/theGobindSingh/ez-gform#readme",
+  "bugs": "https://github.com/theGobindSingh/ez-gform/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/theGobindSingh/ez-gform.git",
+    "directory": "packages/react"
+  },
+  "keywords": [
+    "google-forms",
+    "ez-gform",
+    "react",
+    "react-hook",
+    "no-backend"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "sideEffects": false,
   "exports": {
     ".": {

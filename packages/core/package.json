@@ -4,6 +4,23 @@
   "description": "Framework-agnostic Google Forms parser, entry encoder, and submitter.",
   "type": "module",
   "license": "MIT",
+  "homepage": "https://github.com/theGobindSingh/ez-gform#readme",
+  "bugs": "https://github.com/theGobindSingh/ez-gform/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/theGobindSingh/ez-gform.git",
+    "directory": "packages/core"
+  },
+  "keywords": [
+    "google-forms",
+    "ez-gform",
+    "form-parser",
+    "form-encoder",
+    "no-backend"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "sideEffects": false,
   "exports": {
     ".": {

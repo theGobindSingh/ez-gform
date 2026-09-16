@@ -25,7 +25,23 @@ describe("toIdentifier", () => {
     expect(toIdentifier("2024 Booking")).toBe("_2024Booking");
   });
 
-  it("falls back to value for an empty string", () => {
-    expect(toIdentifier("")).toBe("value");
+  it("falls back to Form for an empty string", () => {
+    expect(toIdentifier("")).toBe("Form");
+  });
+
+  it("falls back to Form for emoji-only input", () => {
+    expect(toIdentifier("🎉")).toBe("Form");
+  });
+
+  it("suffixes an underscore for a reserved word (capitalized)", () => {
+    expect(toIdentifier("Delete")).toBe("delete_");
+  });
+
+  it("suffixes an underscore for a reserved word (lowercase)", () => {
+    expect(toIdentifier("class")).toBe("class_");
+  });
+
+  it("prefixes a leading digit with words following", () => {
+    expect(toIdentifier("123 go")).toBe("_123Go");
   });
 });
