@@ -7,7 +7,9 @@ const ID = "1FAIpQLSciCcNILfeSdgUavm_GYuCFE_G8InD1YVkIWAiTU_B3-l9AkA";
 describe("buildPrefillUrl", () => {
   it("builds a viewform URL with usp=pp_url and encoded entries", () => {
     const url = buildPrefillUrl(ID, { "entry.1": "hello" });
-    expect(url.startsWith(`https://docs.google.com/forms/d/e/${ID}/viewform?`)).toBe(true);
+    expect(
+      url.startsWith(`https://docs.google.com/forms/d/e/${ID}/viewform?`),
+    ).toBe(true);
     const parsed = new URL(url);
     expect(parsed.searchParams.get("usp")).toBe("pp_url");
     expect(parsed.searchParams.get("entry.1")).toBe("hello");
@@ -49,7 +51,9 @@ describe("buildSubmitBody", () => {
     const body = buildSubmitBody(ID, {}, schema);
     expect(body.get("fbzx")).toBe("-1234567890123456789");
     expect(body.get("pageHistory")).toBe("0,1,2");
-    expect(body.get("partialResponse")).toBe(JSON.stringify([null, null, "-1234567890123456789"]));
+    expect(body.get("partialResponse")).toBe(
+      JSON.stringify([null, null, "-1234567890123456789"]),
+    );
   });
 
   it("generates a random fbzx if the schema doesn't carry one", () => {
@@ -70,7 +74,9 @@ describe("buildSubmitBody", () => {
 
 describe("submitForm", () => {
   it("returns {status: 'sent'} on a successful no-cors fetch", async () => {
-    const fakeFetch = vi.fn().mockResolvedValue({ type: "opaque", status: 0, ok: false });
+    const fakeFetch = vi
+      .fn()
+      .mockResolvedValue({ type: "opaque", status: 0, ok: false });
     const result = await submitForm(
       ID,
       { "entry.1": "hi" },

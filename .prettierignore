@@ -1,0 +1,6 @@
+dist
+.next
+coverage
+pnpm-lock.yaml
+node_modules
+packages/core/src/__fixtures__

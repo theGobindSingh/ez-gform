@@ -11,7 +11,9 @@ describe("extractPublicLoadData", () => {
     const html = readFileSync(`${fixturesDir}question-types-demo.html`, "utf8");
     const data = extractPublicLoadData(html);
     expect(Array.isArray(data)).toBe(true);
-    expect((data as unknown[])[3]).toBe("Understanding Different Question Types");
+    expect((data as unknown[])[3]).toBe(
+      "Understanding Different Question Types",
+    );
   });
 
   it("extracts and JSON.parses the array from event-rsvp.html", () => {
@@ -21,19 +23,26 @@ describe("extractPublicLoadData", () => {
   });
 
   it("throws ParseError when the marker is absent", () => {
-    expect(() => extractPublicLoadData("<html><body>nope</body></html>")).toThrow(ParseError);
+    expect(() => {
+      return extractPublicLoadData("<html><body>nope</body></html>");
+    }).toThrow(ParseError);
   });
 
   it("throws ParseError on a malformed assignment", () => {
-    expect(() => extractPublicLoadData("var FB_PUBLIC_LOAD_DATA_ ")).toThrow(ParseError);
+    expect(() => {
+      return extractPublicLoadData("var FB_PUBLIC_LOAD_DATA_ ");
+    }).toThrow(ParseError);
   });
 
   it("throws ParseError when the array literal is unterminated", () => {
-    expect(() => extractPublicLoadData("var FB_PUBLIC_LOAD_DATA_ = [1, 2, [3")).toThrow(ParseError);
+    expect(() => {
+      return extractPublicLoadData("var FB_PUBLIC_LOAD_DATA_ = [1, 2, [3");
+    }).toThrow(ParseError);
   });
 
   it("correctly bracket-matches nested arrays and brackets inside strings", () => {
-    const html = 'var FB_PUBLIC_LOAD_DATA_ = [1, "a ] weird [ string", [2, 3]];</script>';
+    const html =
+      'var FB_PUBLIC_LOAD_DATA_ = [1, "a ] weird [ string", [2, 3]];</script>';
     const data = extractPublicLoadData(html);
     expect(data).toEqual([1, "a ] weird [ string", [2, 3]]);
   });

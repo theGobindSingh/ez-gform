@@ -20,16 +20,17 @@ ez-gform/
 ├── packages/
 │   ├── core/          # @ez-gform/core
 │   ├── react/          # @ez-gform/react
-│   └── cli/             # @ez-gform/cli
-├── apps/
+│   ├── cli/             # @ez-gform/cli
 │   ├── extension/     # @ez-gform/extension
-│   └── docs/            # @ez-gform/docs
+│   ├── docs/            # @ez-gform/docs
+│   └── tsconfig/       # @ez-gform/tsconfig
 ├── docs/                 # this repo's own docs (research, architecture)
 ├── .github/workflows/  # CI
 ├── turbo.json
 ├── pnpm-workspace.yaml
 ├── package.json
-├── biome.json
+├── eslint.config.mjs
+├── .prettierrc
 └── .changeset/
 ```
 
@@ -83,12 +84,12 @@ An `npx` tool: given a public form URL, fetches it, runs it through
 `@ez-gform/core`'s parser, and emits a JSON schema, TypeScript types, or a
 scaffolded React component. This directly replaces the legacy extension's
 "generate paste-ready code" role for anyone who'd rather run a CLI than
-install a browser extension, and gives `apps/docs`' walkthrough a
+install a browser extension, and gives `packages/docs`' walkthrough a
 non-extension path for obtaining `entry.*` ids — the single biggest
 onboarding gap identified in the legacy `example` repo (gap-analysis
 `example` #3).
 
-## `apps/extension` — `@ez-gform/extension`
+## `packages/extension` — `@ez-gform/extension`
 
 **WXT**, MV3, Chrome + Firefox. Rationale: the legacy extension was
 Chrome-only with no `permissions`/`host_permissions` declared (a Web Store
@@ -103,7 +104,7 @@ single most fragile part of the legacy tool, gap-analysis `extension` #1),
 and explicitly handles `/forms/u/N/d/` URLs via the `URL` API rather than
 string slicing.
 
-## `apps/docs` — `@ez-gform/docs`
+## `packages/docs` — `@ez-gform/docs`
 
 **Next.js (App Router)**, deployed to **Vercel**. Rationale: the legacy
 example app was stuck on Next.js 13 Pages Router, pinned to Node 16 (EOL)
@@ -131,13 +132,15 @@ so the old undocumented wrapper-div/named-sub-input DOM convention
   working test suite (`core`'s `test` script referenced an uninstalled
   `jest`; `extension` had one assertion-free manual smoke script;
   `example` had none at all).
-- **Biome** for lint + format — single fast tool instead of
-  ESLint+Prettier, consistent config shared at the workspace root.
+- **ESLint** (flat config, via the shared `@kami-ui/eslint-config` package)
+  for lint, **Prettier** for format — each package lints itself since the
+  config is type-aware and resolves its tsconfig from the working directory;
+  Prettier's config is root-only.
 - **Changesets** for versioning — the legacy repos had npm/GitHub-org
   naming drift (`@webadeva/...` vs `@hymns-of-web/...`, unpublished
   versions that existed in git but not on npm); Changesets enforces a
   single coordinated release flow across all `@ez-gform/*` packages from a
   consistent scope.
-- **GitHub Actions CI** (lint, typecheck, test, build) gating every PR —
+- **GitHub Actions CI** (lint, type-check, test, build) gating every PR —
   none of the three legacy repos had any CI at all; this is the single
   most repeated gap across all three (gap-analysis, every section).

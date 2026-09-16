@@ -24,8 +24,7 @@
       "Bash(rm -rf /*)",
       "Bash(git push --force*)",
       "Read(./.env)",
-      "Read(./.env.*)",
-      "Read(./apps/**/.env*)"
+      "Read(./.env.*)"
     ]
   },
   "hooks": {
@@ -35,7 +34,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "f=$(jq -r '.tool_input.file_path // empty'); case \"$f\" in *.ts|*.tsx|*.js|*.jsx|*.json) [ -x node_modules/.bin/biome ] && node_modules/.bin/biome format --write \"$f\" >/dev/null 2>&1 || true;; esac; exit 0"
+            "command": "f=$(jq -r '.tool_input.file_path // empty'); case \"$f\" in *.ts|*.tsx|*.js|*.jsx|*.json|*.md|*.mjs) [ -x node_modules/.bin/prettier ] && node_modules/.bin/prettier --write \"$f\" >/dev/null 2>&1 || true;; esac; exit 0"
           }
         ]
       }

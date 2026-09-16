@@ -8,13 +8,13 @@ Form field IDs, a browser extension to help you inspect forms, and the project d
 
 ## Packages
 
-| Package               | Description                                             |
-| ---------------------- | -------------------------------------------------------- |
-| `@ez-gform/core`       | Framework-agnostic core: builds and submits form payloads to Google Forms |
-| `@ez-gform/react`      | React hooks/components built on `@ez-gform/core`         |
-| `@ez-gform/cli`        | CLI to discover Google Form field entry IDs               |
-| `@ez-gform/extension`  | Browser extension to help inspect Google Forms            |
-| `@ez-gform/docs`       | Documentation site                                        |
+| Package               | Description                                                               |
+| --------------------- | ------------------------------------------------------------------------- |
+| `@ez-gform/core`      | Framework-agnostic core: builds and submits form payloads to Google Forms |
+| `@ez-gform/react`     | React hooks/components built on `@ez-gform/core`                          |
+| `@ez-gform/cli`       | CLI to discover Google Form field entry IDs                               |
+| `@ez-gform/extension` | Browser extension to help inspect Google Forms                            |
+| `@ez-gform/docs`      | Documentation site                                                        |
 
 ## Development
 
@@ -27,8 +27,8 @@ pnpm dev           # run dev mode across packages
 pnpm test          # run tests
 pnpm lint          # lint
 pnpm lint:fix       # lint and fix
-pnpm format         # format with biome
-pnpm typecheck      # typecheck
+pnpm format         # format with prettier
+pnpm type-check     # type-check
 pnpm clean          # clean build artifacts
 pnpm changeset      # add a changeset
 pnpm version-packages # bump versions from changesets

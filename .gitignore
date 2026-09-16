@@ -4,7 +4,6 @@ dist/
 .next/
 out/
 .output/
-.wxt/
 coverage/
 *.log
 .env

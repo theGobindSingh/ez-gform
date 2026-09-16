@@ -14,7 +14,11 @@ describe("encodeValues — scalar text/number", () => {
   });
 
   it("skips null, undefined, and empty string", () => {
-    const params = encodeValues({ "entry.1": null, "entry.2": undefined, "entry.3": "" });
+    const params = encodeValues({
+      "entry.1": null,
+      "entry.2": undefined,
+      "entry.3": "",
+    });
     expect([...params.keys()]).toHaveLength(0);
   });
 
@@ -37,7 +41,9 @@ describe("encodeValues — 'Other' option", () => {
   it("encodes a single OtherValue", () => {
     const params = encodeValues({ "entry.1": { other: "my custom answer" } });
     expect(params.get("entry.1")).toBe("__other_option__");
-    expect(params.get("entry.1.other_option_response")).toBe("my custom answer");
+    expect(params.get("entry.1.other_option_response")).toBe(
+      "my custom answer",
+    );
   });
 
   it("encodes an array mixing strings and OtherValue (checkbox + other)", () => {
@@ -49,7 +55,9 @@ describe("encodeValues — 'Other' option", () => {
 
 describe("encodeValues — date", () => {
   it("encodes year/month/day", () => {
-    const params = encodeValues({ "entry.1": { year: 2026, month: 9, day: 16 } });
+    const params = encodeValues({
+      "entry.1": { year: 2026, month: 9, day: 16 },
+    });
     expect(params.get("entry.1_year")).toBe("2026");
     expect(params.get("entry.1_month")).toBe("9");
     expect(params.get("entry.1_day")).toBe("16");
@@ -113,8 +121,20 @@ describe("encodeValues — schema-aware checkbox sentinel", () => {
     formId: "abc",
     title: "t",
     questions: [
-      { id: "1", entryId: "entry.1", title: "Checkbox Q", type: "checkboxes", required: false },
-      { id: "2", entryId: "entry.2", title: "Text Q", type: "short_answer", required: false },
+      {
+        id: "1",
+        entryId: "entry.1",
+        title: "Checkbox Q",
+        type: "checkboxes",
+        required: false,
+      },
+      {
+        id: "2",
+        entryId: "entry.2",
+        title: "Text Q",
+        type: "short_answer",
+        required: false,
+      },
     ],
     sections: [{ title: "t", questionIds: ["1", "2"] }],
     multiPage: false,
@@ -138,7 +158,13 @@ describe("validateValues", () => {
     formId: "abc",
     title: "t",
     questions: [
-      { id: "1", entryId: "entry.1", title: "Required text", type: "short_answer", required: true },
+      {
+        id: "1",
+        entryId: "entry.1",
+        title: "Required text",
+        type: "short_answer",
+        required: true,
+      },
       {
         id: "2",
         entryId: "entry.2",
@@ -163,7 +189,11 @@ describe("validateValues", () => {
   };
 
   it("ok:true when all required entries are present and no unknown ids", () => {
-    const values: FormValues = { "entry.1": "hi", "entry.10": "a", "entry.11": "b" };
+    const values: FormValues = {
+      "entry.1": "hi",
+      "entry.10": "a",
+      "entry.11": "b",
+    };
     expect(validateValues(values, schema)).toEqual({ ok: true });
   });
 
@@ -174,7 +204,11 @@ describe("validateValues", () => {
     );
     expect(result.ok).toBe(false);
     if (!result.ok) {
-      expect(result.errors.some((e) => e.entryId === "entry.999")).toBe(true);
+      expect(
+        result.errors.some((e) => {
+          return e.entryId === "entry.999";
+        }),
+      ).toBe(true);
     }
   });
 
@@ -182,7 +216,9 @@ describe("validateValues", () => {
     const result = validateValues({}, schema);
     expect(result.ok).toBe(false);
     if (!result.ok) {
-      const ids = result.errors.map((e) => e.entryId);
+      const ids = result.errors.map((e) => {
+        return e.entryId;
+      });
       expect(ids).toContain("entry.1");
       expect(ids).toContain("entry.10");
       expect(ids).toContain("entry.11");
@@ -190,6 +226,8 @@ describe("validateValues", () => {
   });
 
   it("encodeValues itself never throws on unknown/missing data", () => {
-    expect(() => encodeValues({ "entry.999": "x" }, schema)).not.toThrow();
+    expect(() => {
+      return encodeValues({ "entry.999": "x" }, schema);
+    }).not.toThrow();
   });
 });

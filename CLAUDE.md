@@ -6,12 +6,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 `ez-gform` is a pnpm + Turborepo monorepo that lets developers submit their own custom form UI to a Google Form without a backend. It is a ground-up rebuild of `webadeva/use-easy-google-form`, its Chrome extension, and its example app. Rebuild plan and package responsibilities: @docs/ARCHITECTURE.md. What was wrong with the old code: @docs/research/gap-analysis.md.
 
-Packages are all scoped `@ez-gform/*`: `core` (framework-agnostic parser/encoder/submit), `react` (hook), `cli` (npx generator), `apps/extension` (WXT MV3), `apps/docs` (Next.js docs + playground), `tooling/tsconfig`.
+Packages are all scoped `@ez-gform/*`, and all live under `packages/`: `core` (framework-agnostic parser/encoder/submit), `react` (hook), `cli` (npx generator), `extension` (WXT MV3), `docs` (Next.js docs + playground), `tsconfig` (shared TS configs).
 
 ## Commands
 
-- Root scripts all go through turbo: `pnpm build|test|lint|typecheck`. Scope with `pnpm turbo run test --filter=@ez-gform/core`.
-- Lint/format is Biome (v2), not ESLint/Prettier: `pnpm biome check .` and `pnpm biome check --write .`. A PostToolUse hook auto-formats edited TS/JS/JSON files.
+- Root scripts all go through turbo: `pnpm build|test|lint|type-check`. Scope with `pnpm turbo run test --filter=@ez-gform/core`.
+- Lint is ESLint flat config via `@kami-ui/eslint-config` (`base` for libraries/CLI, `react` for React packages, `next` for the docs app); Prettier is root-only, config in `.prettierrc`; lint runs per package because the config is type-aware and resolves tsconfig from cwd.
 - Versioning is Changesets: run `pnpm changeset` for any publishable change.
 - Shared deps use the pnpm catalog (`"react": "catalog:"`); workspace deps use `workspace:*`.
 

@@ -47,18 +47,18 @@ Source: [Let's auto-fill Google Forms with URL parameters](https://theconfuzedso
 All values are `encodeURIComponent`-ed before being placed in the query
 string / POST body.
 
-| Question type | Encoding |
-|---|---|
-| Short answer (text) | `entry.NNN=<value>` — single value. |
-| Paragraph | `entry.NNN=<value>` — single value, `\n` for line breaks. |
-| Multiple choice (radio) | `entry.NNN=<option text, exact match>` — single value. |
-| Dropdown | `entry.NNN=<option text, exact match>` — single value. |
-| Checkboxes (multi-value) | Repeat the **same** `entry.NNN` once per selected option: `entry.NNN=OptionA&entry.NNN=OptionB`. |
-| Linear scale | `entry.NNN=<number as string>` — single value, matching one of the scale's defined points. |
-| Date | Three params, all required together: `entry.NNN_year=YYYY&entry.NNN_month=M&entry.NNN_day=D`. |
-| Time | Two params: `entry.NNN_hour=H&entry.NNN_minute=M` (legacy `core` repo also supports `_second`, but Google Forms' native time question only exposes hour/minute in the UI). |
+| Question type                               | Encoding                                                                                                                                                                                                                                                         |
+| ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Short answer (text)                         | `entry.NNN=<value>` — single value.                                                                                                                                                                                                                              |
+| Paragraph                                   | `entry.NNN=<value>` — single value, `\n` for line breaks.                                                                                                                                                                                                        |
+| Multiple choice (radio)                     | `entry.NNN=<option text, exact match>` — single value.                                                                                                                                                                                                           |
+| Dropdown                                    | `entry.NNN=<option text, exact match>` — single value.                                                                                                                                                                                                           |
+| Checkboxes (multi-value)                    | Repeat the **same** `entry.NNN` once per selected option: `entry.NNN=OptionA&entry.NNN=OptionB`.                                                                                                                                                                 |
+| Linear scale                                | `entry.NNN=<number as string>` — single value, matching one of the scale's defined points.                                                                                                                                                                       |
+| Date                                        | Three params, all required together: `entry.NNN_year=YYYY&entry.NNN_month=M&entry.NNN_day=D`.                                                                                                                                                                    |
+| Time                                        | Two params: `entry.NNN_hour=H&entry.NNN_minute=M` (legacy `core` repo also supports `_second`, but Google Forms' native time question only exposes hour/minute in the UI).                                                                                       |
 | Grid (multiple choice grid / checkbox grid) | Each **row** has its own separate `entry.NNN` id (rows are effectively independent sub-questions sharing the same question block); value is the selected column's exact text for radio-grid rows, repeated `entry.NNN=col` per selection for checkbox-grid rows. |
-| "Other" option (radio/checkbox/dropdown) | Set `entry.NNN=__other_option__` to select the "Other" choice, and additionally send `entry.NNN.other_option_response=<free text>` with the typed value. |
+| "Other" option (radio/checkbox/dropdown)    | Set `entry.NNN=__other_option__` to select the "Other" choice, and additionally send `entry.NNN.other_option_response=<free text>` with the typed value.                                                                                                         |
 
 Sources: legacy `core` repo's date/`_year`/`_month`/`_day` and
 time `_hour`/`_minute`/`_second` suffix convention (`src/index.ts`);
@@ -156,22 +156,22 @@ one contains. Source URLs used for verification:
 
 ### Question type codes (verified against live data)
 
-| Code | Type | Notes |
-|---|---|---|
-| 0 | Short answer | |
-| 1 | Paragraph | |
-| 2 | Multiple choice (radio) | |
-| 3 | Dropdown | |
-| 4 | Checkboxes | can carry a validation-rule tuple (e.g. "select exactly N") at `[4][0][3]` when configured |
-| 5 | Linear scale | options are `[["1"],["2"],...]`; low/high labels at `[4][0][3]` |
-| 6 | Section header / title+description block | **not** a page break — an informational block with a title/description and no input; `[4]` is `null` |
-| 7 | Grid (multiple choice grid OR checkbox/tick-box grid) | see "grid kind" below — **same type code for both** |
-| 8 | Section/page break | genuinely splits the form into multiple pages; `[4]` is `null` |
-| 9 | Date | see date flags below |
-| 10 | Time | see time flag below |
-| 11 | Image block (non-input) | |
-| 12 | Video block (non-input) | |
-| 13 | File upload | **no live example found** in this pass — see caveat below |
+| Code | Type                                                  | Notes                                                                                                |
+| ---- | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| 0    | Short answer                                          |                                                                                                      |
+| 1    | Paragraph                                             |                                                                                                      |
+| 2    | Multiple choice (radio)                               |                                                                                                      |
+| 3    | Dropdown                                              |                                                                                                      |
+| 4    | Checkboxes                                            | can carry a validation-rule tuple (e.g. "select exactly N") at `[4][0][3]` when configured           |
+| 5    | Linear scale                                          | options are `[["1"],["2"],...]`; low/high labels at `[4][0][3]`                                      |
+| 6    | Section header / title+description block              | **not** a page break — an informational block with a title/description and no input; `[4]` is `null` |
+| 7    | Grid (multiple choice grid OR checkbox/tick-box grid) | see "grid kind" below — **same type code for both**                                                  |
+| 8    | Section/page break                                    | genuinely splits the form into multiple pages; `[4]` is `null`                                       |
+| 9    | Date                                                  | see date flags below                                                                                 |
+| 10   | Time                                                  | see time flag below                                                                                  |
+| 11   | Image block (non-input)                               |                                                                                                      |
+| 12   | Video block (non-input)                               |                                                                                                      |
+| 13   | File upload                                           | **no live example found** in this pass — see caveat below                                            |
 
 Not independently found live: **type 13 (file upload)**. One fixture
 (`question-types-demo`) explicitly documents in its own description text
@@ -209,6 +209,7 @@ For a date question (type 9), `[4][0]` carries an extra trailing 2-element
 array at index 7: `[includeTime, includeYear]`, each `0` or `1`.
 
 Verified against three independent examples:
+
 - `question-types-demo` "Enter your birthday": `[0, 1]` (no time, has
   year) — plain date-only picker with year shown.
 - `booking-request` "Date Taking Out": `[0, 1]` (no time, has year).
@@ -287,8 +288,8 @@ read status/body. The correct approach is `fetch(url, { method: 'POST',
 mode: 'no-cors' })`, which explicitly acknowledges the response will be
 **opaque** (`response.type === 'opaque'`, `status` always `0`, body always
 empty) — there is no way to detect actual server-side success/failure from
-the fetch response itself; a caller can only know the request was *sent*,
-not that Google *accepted* it. `@ez-gform/core`'s submit function should
+the fetch response itself; a caller can only know the request was _sent_,
+not that Google _accepted_ it. `@ez-gform/core`'s submit function should
 use `no-cors` explicitly (not rely on a silently-swallowed CORS error as
 the legacy `core` repo does) and document this opacity as a hard
 platform constraint, not a bug to "fix" — there is no known reliable

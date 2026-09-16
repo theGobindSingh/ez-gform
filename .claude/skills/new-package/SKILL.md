@@ -1,15 +1,17 @@
 ---
 name: new-package
-description: Scaffold a new @ez-gform/* workspace package with the standard tsup/vitest/biome setup consistent with existing packages.
+description: Scaffold a new @ez-gform/* workspace package with the standard tsup/vitest/eslint setup consistent with existing packages.
 ---
 
 # Adding a package to ez-gform
 
-1. Create `packages/<name>/` (library) or `apps/<name>/` (deployable).
-2. `package.json`: name `@ez-gform/<name>`, `"type": "module"`, `exports` with `import`/`require`/`types`, `files: ["dist"]`, scripts `build`, `dev`, `test`, `lint`, `typecheck`. Copy from `packages/core/package.json`.
-3. `tsconfig.json` extends `@ez-gform/tsconfig/library.json` (or `react-library.json`).
-4. `tsup.config.ts` copied from core: `entry: ["src/index.ts"]`, `format: ["esm","cjs"]`, `dts: true`, `clean: true`, `sourcemap: true`.
-5. Add the package to `pnpm-workspace.yaml` globs if it lives somewhere new (default globs already cover `packages/*` and `apps/*`).
-6. Workspace deps use `"@ez-gform/core": "workspace:*"`.
-7. Add a changeset: `pnpm changeset`.
-8. Run `pnpm turbo run build test lint typecheck --filter=@ez-gform/<name>` before finishing.
+1. Create `packages/<name>/`.
+2. `package.json`: name `@ez-gform/<name>`, `"type": "module"`, `exports` with `import`/`require`/`types`, `files: ["dist"]`, scripts `dev`, `build`, `test`, `lint`, `lint:fix`, `type-check`, `clean`. Copy from `packages/core/package.json`.
+3. `tsconfig.json` extends `@ez-gform/tsconfig/library.json` (or `react-library.json`, `nextjs.json`).
+4. `eslint.config.mjs` importing the matching `@kami-ui/eslint-config` entry point (`/base` for libraries/CLI, `/react` for React packages, `/next` for the docs app).
+5. `tsup.config.ts` copied from core: `entry: ["src/index.ts"]`, `format: ["esm","cjs"]`, `dts: true`, `clean: true`, `sourcemap: true`.
+6. Add the package to `pnpm-workspace.yaml` globs if it lives somewhere new (default glob already covers `packages/*`).
+7. Add the package to the root `tsconfig.json` `references` array.
+8. Workspace deps use `"@ez-gform/core": "workspace:*"`.
+9. Add a changeset: `pnpm changeset`.
+10. Run `pnpm turbo run build test lint type-check --filter=@ez-gform/<name>` before finishing.

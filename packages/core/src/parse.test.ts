@@ -6,9 +6,9 @@ import { parseFormData, parseFormHtml } from "./parse.js";
 
 const fixturesDir = fileURLToPath(new URL("./__fixtures__/", import.meta.url));
 
-function loadFixture(slug: string): unknown {
+const loadFixture = (slug: string): unknown => {
   return JSON.parse(readFileSync(`${fixturesDir}${slug}.json`, "utf8"));
-}
+};
 
 const FIXTURE_SLUGS = [
   "event-feedback",
@@ -46,7 +46,9 @@ describe("parseFormData — event-feedback", () => {
   const schema = parseFormData(loadFixture("event-feedback"));
 
   it("finds the expected question types", () => {
-    const types = schema.questions.map((q) => q.type);
+    const types = schema.questions.map((q) => {
+      return q.type;
+    });
     expect(types).toContain("short_answer");
     expect(types).toContain("checkboxes");
     expect(types).toContain("linear_scale");
@@ -54,7 +56,9 @@ describe("parseFormData — event-feedback", () => {
   });
 
   it("parses linear scale min/max and labels", () => {
-    const scale = schema.questions.find((q) => q.type === "linear_scale");
+    const scale = schema.questions.find((q) => {
+      return q.type === "linear_scale";
+    });
     expect(scale?.scale).toBeDefined();
     expect(scale?.scale?.min).toBe(1);
     expect(typeof scale?.scale?.max).toBe("number");
@@ -75,8 +79,16 @@ describe("parseFormData — question-types-demo (richest fixture)", () => {
   });
 
   it("every section tracks its own question ids, covering all questions", () => {
-    const allIds = schema.sections.flatMap((s) => s.questionIds);
-    expect(allIds.sort()).toEqual(schema.questions.map((q) => q.id).sort());
+    const allIds = schema.sections.flatMap((s) => {
+      return s.questionIds;
+    });
+    expect(allIds.sort()).toEqual(
+      schema.questions
+        .map((q) => {
+          return q.id;
+        })
+        .sort(),
+    );
   });
 
   it("skips image/video/section-header/page-break blocks as questions", () => {
@@ -87,20 +99,23 @@ describe("parseFormData — question-types-demo (richest fixture)", () => {
   });
 
   it("parses a checkbox question with a required-count validation rule", () => {
-    const q = schema.questions.find(
-      (qq) => qq.title === "Holiday activities you enjoy - Select any 2",
-    );
+    const q = schema.questions.find((qq) => {
+      return qq.title === "Holiday activities you enjoy - Select any 2";
+    });
     expect(q?.type).toBe("checkboxes");
     expect(q?.options?.length).toBe(5);
   });
 
   it("parses both grid kinds distinctly", () => {
-    const grid = schema.questions.find(
-      (q) => q.title === "How do you feel about the following statements about travel?",
-    );
-    const checkboxGrid = schema.questions.find(
-      (q) => q.title === "Where would you like to do the following activities?",
-    );
+    const grid = schema.questions.find((q) => {
+      return (
+        q.title ===
+        "How do you feel about the following statements about travel?"
+      );
+    });
+    const checkboxGrid = schema.questions.find((q) => {
+      return q.title === "Where would you like to do the following activities?";
+    });
     expect(grid?.type).toBe("grid");
     expect(checkboxGrid?.type).toBe("checkbox_grid");
     expect(grid?.rows?.length).toBeGreaterThan(1);
@@ -109,22 +124,30 @@ describe("parseFormData — question-types-demo (richest fixture)", () => {
       expect(row.entryId.startsWith("entry.")).toBe(true);
       expect(row.label.length).toBeGreaterThan(0);
     }
-    expect(grid?.entryId).toBe(`entry.${grid?.rows?.[0]?.entryId.replace("entry.", "")}`);
+    expect(grid?.entryId).toBe(
+      `entry.${grid?.rows?.[0]?.entryId.replace("entry.", "")}`,
+    );
   });
 
   it("parses date question flags", () => {
-    const q = schema.questions.find((qq) => qq.title === "Enter your birthday");
+    const q = schema.questions.find((qq) => {
+      return qq.title === "Enter your birthday";
+    });
     expect(q?.type).toBe("date");
     expect(q?.date).toEqual({ includeTime: false, includeYear: true });
   });
 
   it("parses time question flag", () => {
-    const q = schema.questions.find((qq) => qq.type === "time");
+    const q = schema.questions.find((qq) => {
+      return qq.type === "time";
+    });
     expect(q?.time).toEqual({ isDuration: false });
   });
 
   it("parses linear scale with low/high labels", () => {
-    const q = schema.questions.find((qq) => qq.type === "linear_scale");
+    const q = schema.questions.find((qq) => {
+      return qq.type === "linear_scale";
+    });
     expect(q?.scale?.lowLabel).toBe("Not at all");
     expect(q?.scale?.highLabel).toBe("Very much");
     expect(q?.scale?.min).toBe(1);
@@ -132,7 +155,9 @@ describe("parseFormData — question-types-demo (richest fixture)", () => {
   });
 
   it("marks required questions correctly", () => {
-    const nameQ = schema.questions.find((q) => q.title === "Your first name");
+    const nameQ = schema.questions.find((q) => {
+      return q.title === "Your first name";
+    });
     expect(nameQ?.required).toBe(false);
   });
 });
@@ -140,13 +165,17 @@ describe("parseFormData — question-types-demo (richest fixture)", () => {
 describe("parseFormData — booking-request and meeting-room-reservation date flags", () => {
   it("booking-request date question: no time, has year", () => {
     const schema = parseFormData(loadFixture("booking-request"));
-    const dateQ = schema.questions.find((q) => q.type === "date");
+    const dateQ = schema.questions.find((q) => {
+      return q.type === "date";
+    });
     expect(dateQ?.date).toEqual({ includeTime: false, includeYear: true });
   });
 
   it("meeting-room-reservation date question: has time and year", () => {
     const schema = parseFormData(loadFixture("meeting-room-reservation"));
-    const dateQ = schema.questions.find((q) => q.title === "Start Day and Time");
+    const dateQ = schema.questions.find((q) => {
+      return q.title === "Start Day and Time";
+    });
     expect(dateQ?.date).toEqual({ includeTime: true, includeYear: true });
   });
 });
@@ -154,23 +183,35 @@ describe("parseFormData — booking-request and meeting-room-reservation date fl
 describe("parseFormData — ttrpg-applications 'Other' option (second example)", () => {
   it("finds the Other-flagged option on the checkbox question", () => {
     const schema = parseFormData(loadFixture("ttrpg-applications"));
-    const q = schema.questions.find((qq) => qq.type === "checkboxes");
-    expect(q?.options?.some((o) => o.isOther && o.value === "")).toBe(true);
+    const q = schema.questions.find((qq) => {
+      return qq.type === "checkboxes";
+    });
+    expect(
+      q?.options?.some((o) => {
+        return o.isOther && o.value === "";
+      }),
+    ).toBe(true);
   });
 });
 
 describe("parseFormData — error handling", () => {
   it("throws ParseError on non-array input", () => {
-    expect(() => parseFormData({})).toThrow(ParseError);
+    expect(() => {
+      return parseFormData({});
+    }).toThrow(ParseError);
   });
 
   it("throws ParseError when data[1] is missing", () => {
-    expect(() => parseFormData([null])).toThrow(ParseError);
+    expect(() => {
+      return parseFormData([null]);
+    }).toThrow(ParseError);
   });
 
   it("throws ParseError on unknown question type code", () => {
     const bad = [null, [null, [[1, "Title", null, 999, null]]], null, "Title"];
-    expect(() => parseFormData(bad)).toThrow(ParseError);
+    expect(() => {
+      return parseFormData(bad);
+    }).toThrow(ParseError);
   });
 });
 
@@ -178,7 +219,9 @@ describe("parseFormHtml", () => {
   it("extracts and parses question-types-demo.html end to end", () => {
     const html = readFileSync(`${fixturesDir}question-types-demo.html`, "utf8");
     const schema = parseFormHtml(html);
-    expect(schema.title).toBe("Understanding Different Question Types in Google Forms");
+    expect(schema.title).toBe(
+      "Understanding Different Question Types in Google Forms",
+    );
     expect(schema.multiPage).toBe(true);
     expect(schema.fbzx).toBeDefined();
   });

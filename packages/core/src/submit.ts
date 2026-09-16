@@ -3,7 +3,11 @@ import type { FormSchema, FormValues } from "./types.js";
 import { formUrls, normalizeFormId } from "./url.js";
 
 /** Builds a human-facing `/viewform?usp=pp_url&entry.N=...` prefill URL. */
-export function buildPrefillUrl(formId: string, values: FormValues, schema?: FormSchema): string {
+export const buildPrefillUrl = (
+  formId: string,
+  values: FormValues,
+  schema?: FormSchema,
+): string => {
   const { viewform } = formUrls(formId);
   const params = encodeValues(values, schema);
   const url = new URL(viewform);
@@ -12,7 +16,7 @@ export function buildPrefillUrl(formId: string, values: FormValues, schema?: For
     url.searchParams.append(key, value);
   }
   return url.toString();
-}
+};
 
 /**
  * A per-load anti-replay token Google embeds as a hidden `fbzx` input. When a
@@ -21,24 +25,28 @@ export function buildPrefillUrl(formId: string, values: FormValues, schema?: For
  * the same shape Google's own client-side JS produces, as a best-effort
  * fallback — it is not guaranteed to be accepted.
  */
-function randomFbzx(): string {
-  const digits = Array.from({ length: 19 }, () => Math.floor(Math.random() * 10)).join("");
+const randomFbzx = (): string => {
+  const digits = Array.from({ length: 19 }, () => {
+    return Math.floor(Math.random() * 10);
+  }).join("");
   return `-${digits}`;
-}
+};
 
 /** Builds the full `application/x-www-form-urlencoded` body for a `formResponse` POST. */
-export function buildSubmitBody(
+export const buildSubmitBody = (
   formId: string,
   values: FormValues,
   schema?: FormSchema,
-): URLSearchParams {
+): URLSearchParams => {
   normalizeFormId(formId);
   const params = encodeValues(values, schema);
 
   if (schema?.multiPage) {
     const fbzx = schema.fbzx ?? randomFbzx();
     const pageCount = Math.max(schema.sections.length, 1);
-    const pageHistory = Array.from({ length: pageCount }, (_, i) => i).join(",");
+    const pageHistory = Array.from({ length: pageCount }, (_, i) => {
+      return i;
+    }).join(",");
     params.set("fbzx", fbzx);
     params.set("pageHistory", pageHistory);
     params.set("partialResponse", JSON.stringify([null, null, fbzx]));
@@ -46,7 +54,7 @@ export function buildSubmitBody(
 
   params.set("submit", "Submit");
   return params;
-}
+};
 
 export type SubmitResult =
   | { status: "sent" }
@@ -68,11 +76,11 @@ export interface SubmitOptions {
  * §6. Pass `mode: "cors"` from Node/CLI contexts where the response can
  * actually be read.
  */
-export async function submitForm(
+export const submitForm = async (
   formId: string,
   values: FormValues,
   opts: SubmitOptions = {},
-): Promise<SubmitResult> {
+): Promise<SubmitResult> => {
   const { formResponse } = formUrls(formId);
   const body = buildSubmitBody(formId, values, opts.schema);
   const doFetch = opts.fetch ?? fetch;
@@ -102,4 +110,4 @@ export async function submitForm(
   } catch (error) {
     return { status: "error", error };
   }
-}
+};

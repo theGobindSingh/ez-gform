@@ -13,19 +13,23 @@ const ASSIGNMENT_MARKER = "FB_PUBLIC_LOAD_DATA_";
  * the matching closing bracket by walking the string and tracking bracket
  * depth while respecting JSON string-escaping rules.
  */
-export function extractPublicLoadData(html: string): unknown {
+export const extractPublicLoadData = (html: string): unknown => {
   const markerIndex = html.indexOf(ASSIGNMENT_MARKER);
   if (markerIndex === -1) {
-    throw new ParseError("extractPublicLoadData: FB_PUBLIC_LOAD_DATA_ not found in HTML");
+    throw new ParseError(
+      "extractPublicLoadData: FB_PUBLIC_LOAD_DATA_ not found in HTML",
+    );
   }
 
   const equalsIndex = html.indexOf("=", markerIndex);
   if (equalsIndex === -1) {
-    throw new ParseError("extractPublicLoadData: malformed FB_PUBLIC_LOAD_DATA_ assignment");
+    throw new ParseError(
+      "extractPublicLoadData: malformed FB_PUBLIC_LOAD_DATA_ assignment",
+    );
   }
 
   let start = equalsIndex + 1;
-  while (start < html.length && /\s/.test(html[start] as string)) {
+  while (start < html.length && /\s/.test(html[start]!)) {
     start++;
   }
 
@@ -47,10 +51,10 @@ export function extractPublicLoadData(html: string): unknown {
       }`,
     );
   }
-}
+};
 
 /** Walks from `startIndex` (the opening `[`) and returns the index of its matching `]`. */
-function findMatchingBracketEnd(text: string, startIndex: number): number {
+const findMatchingBracketEnd = (text: string, startIndex: number): number => {
   let depth = 0;
   let inString = false;
   let escaped = false;
@@ -84,10 +88,10 @@ function findMatchingBracketEnd(text: string, startIndex: number): number {
   throw new ParseError(
     "extractPublicLoadData: unterminated array literal (no matching closing bracket)",
   );
-}
+};
 
 /** Extracts the `fbzx` hidden-input value from a `/viewform` page, if present. */
-export function extractFbzx(html: string): string | undefined {
-  const match = html.match(/name="fbzx"\s+value="([^"]*)"/);
+export const extractFbzx = (html: string): string | undefined => {
+  const match = /name="fbzx"\s+value="([^"]*)"/.exec(html);
   return match?.[1];
-}
+};

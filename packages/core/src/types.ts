@@ -51,15 +51,20 @@ export interface FormSchema {
   fbzx?: string;
 }
 
-export type DateValue = {
+export interface DateValue {
   year?: number;
   month: number;
   day: number;
   hour?: number;
   minute?: number;
-};
-export type TimeValue = { hour: number; minute: number };
-export type OtherValue = { other: string };
+}
+export interface TimeValue {
+  hour: number;
+  minute: number;
+}
+export interface OtherValue {
+  other: string;
+}
 
 export type FieldValue =
   | string

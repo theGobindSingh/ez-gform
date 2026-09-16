@@ -19,19 +19,20 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup && tsc -p tsconfig.build.json",
+    "build": "tsup",
     "dev": "tsup --watch",
     "test": "vitest run",
-    "lint": "biome check .",
-    "lint:fix": "biome check --write .",
-    "format": "biome format --write .",
-    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "type-check": "tsc --noEmit",
     "clean": "rm -rf dist"
   },
   "devDependencies": {
     "@ez-gform/tsconfig": "workspace:*",
+    "@kami-ui/eslint-config": "0.0.6",
     "@types/node": "^22.10.0",
     "@vitest/coverage-v8": "5.0.1",
+    "eslint": "10.10.0",
     "tsup": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
