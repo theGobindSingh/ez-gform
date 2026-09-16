@@ -1,0 +1,44 @@
+{
+  "name": "@ez-gform/content-script",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Content script that fetches or reads a Google Form's HTML for the popup to parse.",
+  "type": "module",
+  "license": "MIT",
+  "main": "dist/content-script.js",
+  "exports": {
+    ".": {
+      "import": "./dist/content-script.js",
+      "require": "./dist/content-script.cjs",
+      "types": "./dist/content-script.d.ts"
+    }
+  },
+  "scripts": {
+    "dev": "concurrently \"tsc -w --noEmit\" \"rollup -c -w\"",
+    "build": "tsc --noEmit && rollup -c",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist node_modules/.cache",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@ez-gform/core": "workspace:*",
+    "@ez-gform/types": "workspace:*"
+  },
+  "devDependencies": {
+    "@ez-gform/tsconfig": "workspace:*",
+    "@kami-ui/eslint-config": "0.0.6",
+    "@rollup/plugin-commonjs": "29.0.3",
+    "@rollup/plugin-node-resolve": "16.0.3",
+    "@rollup/plugin-typescript": "12.3.0",
+    "@types/chrome": "0.3.0",
+    "@vitest/coverage-v8": "5.0.1",
+    "concurrently": "10.0.5",
+    "eslint": "10.10.0",
+    "rollup": "4.63.3",
+    "tslib": "2.8.1",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

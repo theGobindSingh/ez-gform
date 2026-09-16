@@ -6,6 +6,11 @@
     { "path": "./packages/core" },
     { "path": "./packages/react" },
     { "path": "./packages/codegen" },
-    { "path": "./packages/cli" }
+    { "path": "./packages/cli" },
+    { "path": "./packages/background" },
+    { "path": "./packages/content-script" },
+    { "path": "./packages/popup" },
+    { "path": "./packages/extension" },
+    { "path": "./packages/docs" }
   ]
 }

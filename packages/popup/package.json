@@ -1,0 +1,48 @@
+{
+  "name": "@ez-gform/popup",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Popup UI: parses the active tab's Google Form and generates paste-ready code via @ez-gform/codegen.",
+  "type": "module",
+  "license": "MIT",
+  "main": "dist/popup.js",
+  "exports": {
+    ".": {
+      "import": "./dist/popup.js",
+      "require": "./dist/popup.js"
+    }
+  },
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "tsc --noEmit && vite build",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist node_modules/.cache",
+    "lint": "eslint src --ext .ts,.tsx",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@ez-gform/codegen": "workspace:*",
+    "@ez-gform/core": "workspace:*",
+    "@ez-gform/types": "workspace:*",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@ez-gform/tsconfig": "workspace:*",
+    "@kami-ui/eslint-config": "0.0.6",
+    "@testing-library/jest-dom": "6.6.3",
+    "@testing-library/react": "16.1.0",
+    "@testing-library/user-event": "14.5.2",
+    "@types/chrome": "0.3.0",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@vitejs/plugin-react": "6.1.1",
+    "@vitest/coverage-v8": "5.0.1",
+    "eslint": "10.10.0",
+    "jsdom": "25.0.1",
+    "typescript": "catalog:",
+    "vite": "8.3.0",
+    "vitest": "catalog:"
+  }
+}
