@@ -1,0 +1,40 @@
+{
+  "name": "@ez-gform/cli",
+  "version": "0.0.0",
+  "description": "npx tool: fetch a public Google Form and emit JSON schema, TS types, a React component, or a plain HTML form.",
+  "type": "module",
+  "license": "MIT",
+  "sideEffects": false,
+  "bin": {
+    "ez-gform": "./dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@ez-gform/codegen": "workspace:*",
+    "@ez-gform/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@ez-gform/tsconfig": "workspace:*",
+    "@kami-ui/eslint-config": "0.0.6",
+    "@types/node": "^22.10.0",
+    "@vitest/coverage-v8": "5.0.1",
+    "eslint": "10.10.0",
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
