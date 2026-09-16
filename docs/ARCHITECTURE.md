@@ -19,13 +19,16 @@ fast across four+ packages.
 ez-gform/
 ├── packages/
 │   ├── types/           # @ez-gform/types
-│   ├── core/          # @ez-gform/core
-│   ├── react/          # @ez-gform/react
-│   ├── codegen/       # @ez-gform/codegen
+│   ├── core/            # @ez-gform/core
+│   ├── react/           # @ez-gform/react
+│   ├── codegen/         # @ez-gform/codegen
 │   ├── cli/             # @ez-gform/cli
-│   ├── extension/     # @ez-gform/extension
+│   ├── background/      # @ez-gform/background (private, MV3 service worker)
+│   ├── content-script/  # @ez-gform/content-script (private)
+│   ├── popup/           # @ez-gform/popup (private, popup UI)
+│   ├── extension/       # @ez-gform/extension (private, assembles the three above into dist/)
 │   ├── docs/            # @ez-gform/docs
-│   └── tsconfig/       # @ez-gform/tsconfig
+│   └── tsconfig/        # @ez-gform/tsconfig
 ├── docs/                 # this repo's own docs (research, architecture)
 ├── .github/workflows/  # CI
 ├── turbo.json
@@ -118,20 +121,42 @@ non-extension path for obtaining `entry.*` ids — the single biggest
 onboarding gap identified in the legacy `example` repo (gap-analysis
 `example` #3).
 
-## `packages/extension` — `@ez-gform/extension`
+## `packages/background`, `packages/content-script`, `packages/popup`, `packages/extension`
 
-**WXT**, MV3, Chrome + Firefox. Rationale: the legacy extension was
-Chrome-only with no `permissions`/`host_permissions` declared (a Web Store
-review risk), injected escaped code as a `<p>` into the live Google Forms
-page with no dedup guard (duplicating on every reload), and used a
-fragile regex that mishandled `/forms/u/<n>/d/...` multi-account URLs
-(gap-analysis `extension` #5, #6, #8). WXT gives cross-browser manifest
-generation for free, and a proper popup UI (with a copy button) replaces
-DOM injection entirely. Uses `@ez-gform/core`'s `FB_PUBLIC_LOAD_DATA_`
-parser instead of hardcoded CSS-class/`jscontroller` scraping (fixing the
-single most fragile part of the legacy tool, gap-analysis `extension` #1),
-and explicitly handles `/forms/u/N/d/` URLs via the `URL` API rather than
-string slicing.
+Four private, boilerplate-style packages (Rollup/Vite build tooling, no
+WXT) that together replace the legacy single-repo extension:
+
+- `@ez-gform/background` — MV3 service worker that relays
+  `EZ_GFORM_GET_SOURCE` requests from the popup to the active tab's
+  content script.
+- `@ez-gform/content-script` — fetches or reads a Google Form's HTML for
+  the popup to parse.
+- `@ez-gform/popup` — the popup UI: parses the active tab's Google Form
+  via `@ez-gform/core` and generates paste-ready code via
+  `@ez-gform/codegen`. Replaces the legacy extension's DOM-injection
+  output entirely.
+- `@ez-gform/extension` — contains no extension logic itself; it builds
+  the three packages above (Turborepo `^build` dependency) and assembles
+  their outputs plus generated icons into `packages/extension/dist/`,
+  writing `manifest.json`.
+
+All four use `@ez-gform/core`'s `FB_PUBLIC_LOAD_DATA_` parser instead of
+hardcoded CSS-class/`jscontroller` scraping (fixing the single most
+fragile part of the legacy tool, gap-analysis `extension` #1), and
+explicitly handle `/forms/u/N/d/` URLs via the `URL` API rather than
+string slicing (gap-analysis `extension` #8). The manifest declares
+explicit `host_permissions` for `docs.google.com` (gap-analysis
+`extension` #5).
+
+**Chrome-only for now.** The manifest is MV3 with
+`background.service_worker`; Firefox's MV3 service-worker support is
+still incomplete, expecting `background.scripts` instead unless run
+under a `browser_specific_settings.gecko` override with the newer
+service-worker support enabled in `about:config`. No Firefox-specific
+manifest variant is generated yet, so this closes gap-analysis
+`extension` #7 for Chrome (and Chromium-based browsers — Edge, Brave,
+etc.) only; a Firefox build remains open work, tracked as an explicit
+unsupported-for-now limitation rather than a silent gap.
 
 ## `packages/docs` — `@ez-gform/docs`
 
@@ -154,9 +179,12 @@ so the old undocumented wrapper-div/named-sub-input DOM convention
   had `strict` on but still leaked `any` in its switch statement
   (gap-analysis `core` #4); strict mode plus lint rules banning `any`
   closes that gap for good.
-- **tsup** builds ESM + CJS + `.d.ts` for every publishable package —
-  matches the legacy Rollup output shape (CJS+ESM+types) without Rollup's
-  two-pass config duplication.
+- **tsup** builds ESM + CJS + `.d.ts` for every publishable package
+  (`types`, `core`, `react`, `codegen`, `cli`). The private extension
+  packages build differently since they ship browser bundles, not a
+  library: `background`/`content-script` use Rollup, `popup` uses Vite,
+  and `extension` runs a small `tsx` script that assembles the three
+  outputs into `dist/` and writes `manifest.json`.
 - **Vitest** for all packages — none of the three legacy repos had a
   working test suite (`core`'s `test` script referenced an uninstalled
   `jest`; `extension` had one assertion-free manual smoke script;

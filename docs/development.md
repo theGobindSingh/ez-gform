@@ -32,6 +32,20 @@ Scope any task to one package with `--filter`:
 pnpm turbo run test --filter=@ez-gform/core
 ```
 
+Two packages are commonly run standalone rather than through the full
+`turbo` fan-out:
+
+- `pnpm --filter @ez-gform/docs dev` — run the docs/playground site
+  locally.
+- `pnpm --filter @ez-gform/extension build` — builds
+  `@ez-gform/background`, `@ez-gform/content-script`, and
+  `@ez-gform/popup` first (Turborepo's `^build` dependency), then
+  assembles them into `packages/extension/dist`. Load that directory
+  unpacked at `chrome://extensions` (Developer mode → Load unpacked); see
+  `packages/extension/README.md` for the full walkthrough. Chrome-only
+  for now — Firefox's MV3 service-worker support is incomplete (see
+  `docs/ARCHITECTURE.md`).
+
 ## Lint and format
 
 Lint is ESLint flat config, sourced from the shared `@kami-ui/eslint-config`

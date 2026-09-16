@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 `ez-gform` is a pnpm + Turborepo monorepo that lets developers submit their own custom form UI to a Google Form without a backend. It is a ground-up rebuild of `webadeva/use-easy-google-form`, its Chrome extension, and its example app. Rebuild plan and package responsibilities: @docs/ARCHITECTURE.md. What was wrong with the old code: @docs/research/gap-analysis.md.
 
-Packages are all scoped `@ez-gform/*`, and all live under `packages/`: `types` (shared TypeScript types), `core` (framework-agnostic parser/encoder/submit), `react` (hook), `codegen` (pure code generators: JSON/types/React/HTML), `cli` (npx generator), `extension` (WXT MV3), `docs` (Next.js docs + playground), `tsconfig` (shared TS configs).
+Packages are all scoped `@ez-gform/*`, and all live under `packages/`: `types` (shared TypeScript types), `core` (framework-agnostic parser/encoder/submit), `react` (hook), `codegen` (pure code generators: JSON/types/React/HTML), `cli` (npx generator), `background`/`content-script`/`popup` (private, boilerplate-style Rollup/Vite MV3 extension pieces, Chrome-only, no WXT) assembled by `extension` (private), `docs` (Next.js 16 App Router docs + playground), `tsconfig` (shared TS configs).
 
 ## Commands
 

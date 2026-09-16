@@ -8,15 +8,25 @@ Form field IDs, a browser extension to help you inspect forms, and the project d
 
 ## Packages
 
-| Package               | Description                                                               |
-| --------------------- | ------------------------------------------------------------------------- |
-| `@ez-gform/types`     | Shared TypeScript types (schema, values, submit, codegen, messages)       |
-| `@ez-gform/core`      | Framework-agnostic core: builds and submits form payloads to Google Forms |
-| `@ez-gform/react`     | React hooks/components built on `@ez-gform/core`                          |
-| `@ez-gform/codegen`   | Pure code generators (JSON schema, TS types, React component, HTML form)  |
-| `@ez-gform/cli`       | CLI to discover Google Form field entry IDs                               |
-| `@ez-gform/extension` | Browser extension to help inspect Google Forms                            |
-| `@ez-gform/docs`      | Documentation site                                                        |
+Published to npm:
+
+| Package             | Description                                                               |
+| ------------------- | ------------------------------------------------------------------------- |
+| `@ez-gform/types`   | Shared TypeScript types (schema, values, submit, codegen, messages)       |
+| `@ez-gform/core`    | Framework-agnostic core: builds and submits form payloads to Google Forms |
+| `@ez-gform/react`   | React hooks/components built on `@ez-gform/core`                          |
+| `@ez-gform/codegen` | Pure code generators (JSON schema, TS types, React component, HTML form)  |
+| `@ez-gform/cli`     | `npx` tool to discover Google Form field entry IDs and generate code      |
+
+Private apps (not published):
+
+| Package                    | Description                                                                           |
+| -------------------------- | ------------------------------------------------------------------------------------- |
+| `@ez-gform/background`     | MV3 service worker relaying popup <-> content-script messages                         |
+| `@ez-gform/content-script` | Fetches/reads a Google Form's HTML for the popup to parse                             |
+| `@ez-gform/popup`          | Extension popup UI: parses the active tab's form, generates paste-ready code          |
+| `@ez-gform/extension`      | Assembles `background`/`content-script`/`popup` into a loadable `dist/` (Chrome, MV3) |
+| `@ez-gform/docs`           | Documentation site and interactive playground (Next.js App Router)                    |
 
 ## Development
 
@@ -36,6 +46,53 @@ pnpm changeset      # add a changeset
 pnpm version-packages # bump versions from changesets
 pnpm release        # build and publish
 ```
+
+Scope any task to one package with `--filter`, e.g.
+`pnpm turbo run test --filter=@ez-gform/core`.
+
+## Quick start (React)
+
+```sh
+pnpm add @ez-gform/react @ez-gform/core react
+```
+
+```tsx
+import { useGoogleForm } from "@ez-gform/react";
+
+function ContactForm({ schema }) {
+  const { register, submit, status } = useGoogleForm({
+    formId: schema.formId,
+    schema,
+  });
+
+  return (
+    <form onSubmit={submit}>
+      <input aria-label="Your name" {...register("entry.111")} />
+      <button type="submit">Send</button>
+      {status === "sent" && <p>Thanks!</p>}
+    </form>
+  );
+}
+```
+
+See `packages/react/README.md` for the full API, including the
+`useEasyGoogleForm` legacy compat shim.
+
+## CLI
+
+```sh
+npx @ez-gform/cli <google-form-url>
+```
+
+## Browser extension
+
+Build and load unpacked; see `packages/extension/README.md` for the full
+walkthrough (Chrome-only for now — see `docs/ARCHITECTURE.md`).
+
+## Docs
+
+The docs site lives in `packages/docs`; deploy to Vercel with root
+directory `packages/docs`.
 
 ## License
 

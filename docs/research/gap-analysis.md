@@ -132,3 +132,113 @@ package, each with a one-line rebuild fix.
 - **No CI anywhere in any of the three repos.** _Fix: one Turborepo-wide
   GitHub Actions workflow (lint, typecheck, test, build) gating every PR
   across all packages._
+
+## Status after rebuild
+
+Honest accounting of every gap above, closed or open, against the
+codebase as it stands today.
+
+### `core`
+
+1. Closed — `packages/core` has a real Vitest suite (`*.test.ts` colocated
+   with source).
+2. Closed — `useGoogleForm` (`packages/react`) exposes
+   `status: 'idle'|'submitting'|'sent'|'ok'|'error'` and `submit` returns a
+   promise.
+3. Closed — `packages/core` never touches the DOM; `packages/react` takes
+   registered refs/values, no raw `querySelector` id interpolation.
+4. Closed — `packages/core`, `packages/react`, `packages/codegen` are
+   TypeScript strict, no `any` in encoder/parser switch statements.
+5. Closed — no non-null assertions on optional event handlers in
+   `packages/react`.
+6. Closed — no dead `postbuild` scripts; `tsup.config.ts` is audited per
+   package.
+7. Closed — `packages/core`'s schema/encoder validates required fields
+   against the parsed `FB_PUBLIC_LOAD_DATA_` schema before submit.
+8. Closed — `packages/types`' `QuestionType` union and `packages/core`'s
+   encoder cover file upload, grid, and linear scale (documented as
+   unsupported for submission where the `formResponse` endpoint genuinely
+   can't accept them).
+9. Closed — `useGoogleForm`'s state machine rejects/reuses in-flight
+   submits instead of double-posting.
+10. Closed — parser/encoder/submit are separate, independently unit-tested
+    modules under `packages/core/src`.
+11. Closed — `.github/workflows/` runs lint/typecheck/test/build on every
+    PR.
+12. Closed — `packages/react`'s peer range matches what CI actually tests;
+    no ref-based DOM reads for the controlled-value API.
+13. Closed — `packages/core/package.json` has zero runtime dependencies.
+
+### `extension`
+
+1. Closed — `packages/content-script` and `packages/popup` parse
+   `FB_PUBLIC_LOAD_DATA_` via `@ez-gform/core`, no CSS-class/`jscontroller`
+   scraping.
+2. Closed — `packages/types`/`packages/core` implement linear scale.
+3. Closed — grid and file upload are recognized types, reported as
+   unsupported-for-submission rather than silently dropped.
+4. Closed — `packages/popup` surfaces explicit error states
+   (not-public/fetch-failed/unsupported-type) instead of relying on
+   ambient cookies with no diagnosis.
+5. Closed — `packages/extension`'s generated `manifest.json` declares
+   `host_permissions` for `docs.google.com`.
+6. Closed — output is a popup UI (`packages/popup`) with a copy button;
+   no DOM injection into the live Forms page.
+7. **Open** — still Chrome-only. The MV3 manifest uses
+   `background.service_worker`, which Firefox's MV3 implementation
+   doesn't fully support yet; no Firefox manifest variant is generated.
+   Documented as a known limitation in `packages/extension/README.md` and
+   `docs/ARCHITECTURE.md`, not silently dropped.
+8. Closed — `/forms/u/N/d/...` URLs are parsed with the `URL` API across
+   `packages/content-script`/`packages/popup`, not regex/string-slicing.
+9. Closed — `pnpm zip` in `packages/extension` produces a release zip;
+   CI can attach it to a tag.
+10. Closed — ids are derived deterministically from `entry.NNNN`, no
+    random `nanoid` per scrape.
+11. Closed — Vitest coverage exists across `background`, `content-script`,
+    `popup`, and `extension` (the manifest-building logic in particular).
+12. Closed — `.github/workflows/` covers this package; Chrome Web
+    Store / Firefox Add-ons submission pipeline itself is not built (no
+    tag-triggered store upload job exists yet) — **open**.
+
+### `example` / docs app
+
+1. Closed — `packages/docs` depends on `@ez-gform/core`/`react`/`codegen`/
+   `types` via `workspace:*`, never an external registry pin.
+2. Closed — `/playground` in `packages/docs` covers every supported
+   question type plus error/loading states driven by the state machine.
+3. Closed — `/getting-started` and the CLI/extension docs eliminate manual
+   `entry.*` ID hunting.
+4. Closed — `useGoogleForm` takes a plain values object; no wrapper-div/
+   named-sub-input convention exists to document.
+5. Closed — `packages/docs` is Next.js 16 App Router, current Node LTS,
+   no `basePath` cruft.
+6. Closed — `packages/docs` has lint/build/test wired into CI like every
+   other workspace package.
+
+### Cross-cutting
+
+- Closed — `@ez-gform/types` is the single source of truth for the form
+  schema type, consumed by `core`, `react`, `codegen`, `cli`, and the
+  extension packages.
+- Closed — single `@ez-gform/*` npm scope throughout; no org-rename debt.
+- Closed — one Turborepo-wide GitHub Actions workflow gates every PR
+  across all packages.
+
+### Genuinely unverified (not exercised by this rebuild)
+
+These three remain open/unverified regardless of what the code claims to
+do, because they require conditions this rebuild didn't (and largely
+can't, in an automated environment) exercise:
+
+- **Real-browser extension load** — `packages/extension`'s `dist/` has not
+  been loaded unpacked into an actual Chrome instance and clicked through
+  against a live Google Form; only its build/assembly logic is unit
+  tested.
+- **Live network submission** — `packages/core`'s `submit` has not been
+  exercised against Google's real `formResponse` endpoint with a live,
+  public Google Form; behavior is verified against captured fixtures in
+  `packages/core/src/__fixtures__/`, not a live request/response cycle.
+- **Firefox support** — not implemented (see `extension` #7 above), so
+  necessarily unverified; treat the extension as Chrome/Chromium-only
+  until a Firefox manifest variant exists and is tested.
