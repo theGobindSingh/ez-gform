@@ -82,56 +82,176 @@ var FB_PUBLIC_LOAD_DATA_ = [ ... ];
 To parse: strip the `var FB_PUBLIC_LOAD_DATA_ = ` prefix and trailing `;`,
 then `JSON.parse` the remainder (it is a JSON-compatible nested array, not a
 JS object — no keys, purely positional/parallel-array encoded). There is
-**no official schema**; the shape below is reverse-engineered and may not
-be stable across all form variants.
+**no official schema**. Everything in this section (unless marked
+"unverified") was independently confirmed on 2026-09-16 by fetching six
+live, public, no-signin `/viewform` pages with plain `curl -sL` and
+inspecting the parsed JSON with node — no form was submitted to. Fixtures
+(raw HTML + pretty-printed JSON) are saved alongside this doc's research
+scratchpad; see the fixture README for exactly which question types each
+one contains. Source URLs used for verification:
 
-Root array (best-documented public description found):
+- `event-feedback` — https://docs.google.com/forms/d/e/1FAIpQLSeea5PBMuJUpTG9ephwFbt4NApN1TPQi6Yc5cNNw0vgPm9Umw/viewform
+- `event-rsvp` — https://docs.google.com/forms/d/e/1FAIpQLSfYyu6DOujdBirlNdKv7qvex3kwJh8q_BEtxESoE6vZQaQV2w/viewform
+- `question-types-demo` — https://docs.google.com/forms/d/e/1FAIpQLSciCcNILfeSdgUavm_GYuCFE_G8InD1YVkIWAiTU_B3-l9AkA/viewform
+- `ttrpg-applications` — https://docs.google.com/forms/d/e/1FAIpQLSfq6m_mqAq406IBKKErxGzzfwdVV6fNMMk2TqFjTQEDkeJaQQ/viewform
+- `booking-request` — https://docs.google.com/forms/d/e/1FAIpQLSeY-Ly53GKeAESPVGnxkNQxXFcJBUFOAKVnmtwKcso3tSf0NA/viewform
+- `meeting-room-reservation` — https://docs.google.com/forms/d/e/1FAIpQLSeT7JUpxNspz1Fk1lojsMBqd2TDWXFKpf3Ahv1uNY84HSEYeQ/viewform
+
+### Root array (verified)
 
 - `[1]` — main container: form metadata + questions.
-  - `[1][0]` — form description.
-  - `[1][1]` — array of question entries (one element per question).
-  - `[1][8]` — form title (inside the `[1]` container, not root).
-- `[3]` — form name/title (also present at root level in some captures —
-  the two title locations found in different write-ups were not
-  cross-verified against each other; **treat form-title location as
-  unconfirmed**, verify against a live capture before relying on it).
-- `[14]` — form id.
+  - `[1][0]` — form **description** (string, may be multi-line/HTML-escaped
+    plain text). Verified across all 6 fixtures.
+  - `[1][1]` — array of question entries, one element per question,
+    including non-input elements (section headers, page breaks, image/video
+    blocks). Verified across all 6 fixtures.
+  - `[1][8]` — form **title** (`[null, "<title text>"]` — a 2-element array
+    whose second element is the title; same `[null, text]` wrapper shape is
+    reused for description/title pairs elsewhere in the structure).
+    Verified across all 6 fixtures.
+- `[3]` — also the form title, as a **plain string** (not wrapped in
+  `[null, ...]`) — this is the same title text as `[1][8][1]`, just
+  duplicated at root level in a different shape. Both locations were
+  cross-verified against each other in all 6 fixtures and always matched
+  (small whitespace/trailing-space differences seen in one fixture, e.g.
+  `"Job Application"` vs `"Job Application "`, are cosmetic). Prior
+  uncertainty about whether these were two different fields is resolved:
+  they are the same title, in two encodings.
+- `[14]` — form id, as the string `"e/<published-id>"` — i.e. it includes
+  the `e/` prefix, not just the bare id from the `/d/e/<id>/viewform` URL.
+  Verified across all 6 fixtures.
 
-Each question entry (inside `[1][1]`):
+### Each question entry (inside `[1][1][i]`) — verified
 
-- `[1]` — question text.
+- `[0]` — question id (a numeric id distinct from the entry/field id; not
+  the `entry.NNN` submission id).
+- `[1]` — question title text.
+- `[2]` — question description/help text, or `null` if none.
 - `[3]` — question type code (see table below).
-- `[4]` — array of "sub-question" descriptors (plural, because grid
-  questions have one entry per row; simple questions have a single-element
-  array):
-  - `[4][0][0]` — entry/field id (the numeric id used as `entry.<id>`).
-  - `[4][0][1]` — array of option objects/strings (for choice-type
-    questions: multiple choice, dropdown, checkboxes, grid columns).
-  - `[4][0][2]` — required flag (`1` = required, `0`/absent = optional).
+- `[4]` — array of "sub-question" descriptors, or `null` for non-input
+  types (section header, page break, image, video). Plural because grid
+  questions have one element per **row**; simple questions have a
+  single-element array. For each element:
+  - `[4][i][0]` — entry/field id (the numeric id used as `entry.<id>` on
+    submit). For a grid, this is the **row's own, independent** entry id
+    (confirmed: each row in a grid is a separate `entry.NNN`).
+  - `[4][i][1]` — for choice-type questions (radio/dropdown/checkbox/grid
+    column set): array of option tuples, each
+    `[optionText, imageId_or_null, ?, ?, isOtherFlag]`. `isOtherFlag` is
+    `1` when that option is the synthesized "Other" choice (and in that
+    case `optionText` is an empty string `""` — Google leaves the display
+    text blank client-side since the responder types their own); `0`/absent
+    otherwise. Verified with two independent "Other"-option examples
+    (`question-types-demo` and `ttrpg-applications`). For non-choice
+    questions (short answer, paragraph, date, time) this is `null`.
+  - `[4][i][2]` — required flag (`1` = required, `0` = optional).
+  - `[4][i][3]` — for a **grid row**, a single-element array holding the
+    row label text, e.g. `["Location"]`. For a **linear-scale** question,
+    a 2-element array of the low/high end labels, e.g.
+    `["Not at all", "Very much"]` (present even when the author left them
+    blank — Google still ships a slot, possibly empty strings). `null`
+    otherwise.
+  - Further positions vary by type and are mostly `null` padding except
+    where noted below per-type.
 
-Question type codes:
+### Question type codes (verified against live data)
 
-| Code | Type |
-|---|---|
-| 0 | Short answer |
-| 1 | Paragraph |
-| 2 | Multiple choice |
-| 3 | Dropdown |
-| 4 | Checkboxes |
-| 5 | Linear scale |
-| 7 | Grid (multiple choice grid or checkbox grid) |
-| 9 | Date |
-| 10 | Time |
-| 13 | File upload |
+| Code | Type | Notes |
+|---|---|---|
+| 0 | Short answer | |
+| 1 | Paragraph | |
+| 2 | Multiple choice (radio) | |
+| 3 | Dropdown | |
+| 4 | Checkboxes | can carry a validation-rule tuple (e.g. "select exactly N") at `[4][0][3]` when configured |
+| 5 | Linear scale | options are `[["1"],["2"],...]`; low/high labels at `[4][0][3]` |
+| 6 | Section header / title+description block | **not** a page break — an informational block with a title/description and no input; `[4]` is `null` |
+| 7 | Grid (multiple choice grid OR checkbox/tick-box grid) | see "grid kind" below — **same type code for both** |
+| 8 | Section/page break | genuinely splits the form into multiple pages; `[4]` is `null` |
+| 9 | Date | see date flags below |
+| 10 | Time | see time flag below |
+| 11 | Image block (non-input) | |
+| 12 | Video block (non-input) | |
+| 13 | File upload | **no live example found** in this pass — see caveat below |
 
-Source: [Programmatically access your complete Google Forms skeleton](https://theconfuzedsourcecode.wordpress.com/2019/12/15/programmatically-access-your-complete-google-forms-skeleton/)
-(the author explicitly states these indices/codes were found "through trial
-and error," not from any Google documentation). **Not independently
-re-verified against a live Google Form capture in this research pass** —
-before building the parser, fetch a real `/viewform` page containing one of
-each question type and confirm every index against the actual JSON, since
-minor-version drift in this structure across form templates is plausible
-and the source itself is unofficial.
+Not independently found live: **type 13 (file upload)**. One fixture
+(`question-types-demo`) explicitly documents in its own description text
+that it omits a real file-upload question because "File Upload questions
+cannot be used in a Form stored in a Shared Drive... and also cannot be
+used where a domain is enforcing Data Loss Prevention," and the author
+deliberately left it out to keep the form universally fillable. No other
+searched form exposed one either. Type 13's row/option shape is therefore
+still **unverified** — treat it as the community-sourced code (matches the
+original unverified source) but confirm the inner shape before writing a
+parser branch for it.
+
+### Grid kind: radio-grid vs checkbox-grid (verified — they ARE distinguishable)
+
+Both "Multiple choice grid" and "Tick box/checkbox grid" use question type
+`7`. They are distinguished by a **per-row** trailing single-element flag
+array (last element of each row's descriptor array):
+
+- `[0]` on a row → that row is single-select (radio-style) — "Multiple
+  Choice Grid."
+- `[1]` on a row → that row is multi-select (checkbox-style) — "Tick Box
+  Grid."
+
+Verified directly in `question-types-demo.json`: two "Multiple Choice
+Grid" questions have `[0]` on every row, and one "Tick Box Grid" question
+has `[1]` on every row, with the row's own description text confirming
+which UI variant it is ("You can only select one response per row" vs "in
+this one you can select more than one choice per row"). All rows within a
+given grid question shared the same flag in every example seen — i.e. this
+is effectively a per-question, not truly per-row, setting in practice.
+
+### Date question flags (verified)
+
+For a date question (type 9), `[4][0]` carries an extra trailing 2-element
+array at index 7: `[includeTime, includeYear]`, each `0` or `1`.
+
+Verified against three independent examples:
+- `question-types-demo` "Enter your birthday": `[0, 1]` (no time, has
+  year) — plain date-only picker with year shown.
+- `booking-request` "Date Taking Out": `[0, 1]` (no time, has year).
+- `meeting-room-reservation` "Start Day and Time": `[1, 1]` (has time,
+  has year) — confirmed by the question's own title and its distinct
+  "Ending Time" sibling question (a separate type-10 time-only question),
+  which cross-checks that the `1` in the first slot really does mean
+  "this date question also asks for a time," not something else.
+
+No live example with `includeYear = 0` (date without year, e.g. recurring
+birthday/anniversary UI) was found in this pass — the flag's presence and
+first-slot meaning are confirmed, but the "no year" case specifically is
+**unverified** (inferred by exclusion, not directly observed).
+
+### Time question flag (verified)
+
+For a time question (type 10), `[4][0]` carries a single-element array at
+index 6: `[0]` in both observed examples (`question-types-demo`'s wake-up
+time question and `meeting-room-reservation`'s "Ending Time"). Both are
+described as ordinary time-of-day pickers. A form using the "Duration"
+variant of the time question (hours/minutes/seconds elapsed rather than a
+clock time) was not found live, so whether this flips to `[1]` for
+duration mode is **unverified** — inferred from the field's likely purpose
+but not directly observed.
+
+### Section/page breaks (verified)
+
+Type `8` entries are genuine page breaks — `question-types-demo` is a real
+multi-section form (its own description text says so, and its hidden
+`pageHistory` input starts at `"0"` and its type-8 entries carry section
+title/description text in the same `[null, text]` wrapper shape as the
+root title). Type `6` entries look superficially similar (title +
+description, `[4]` null) but are informational blocks that do **not**
+create a new page — confirmed by the form's own text explicitly
+distinguishing the two ("This is a Title and Description block... note
+they are not the same as Sections" for type 6, vs "This is a new section.
+It is used to divide a Form up into separate parts" for type 8).
+
+All 6 fixtures' HTML — single-page and multi-page alike — contained hidden
+`<input>`s named `fbzx`, `pageHistory` (value `"0"` on first load), and
+`partialResponse`, confirming section 5's claim that these are present,
+though their exact round-trip submission behavior for multi-page forms was
+still not tested end-to-end (no submission was made in this pass).
 
 ## 5. Multi-page forms: `fbzx`, `pageHistory`, `partialResponse`
 
