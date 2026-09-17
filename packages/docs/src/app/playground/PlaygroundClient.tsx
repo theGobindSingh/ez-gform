@@ -83,8 +83,14 @@ export const PlaygroundClient = () => {
   }, [schema]);
 
   return (
-    <div>
-      <div className="form-row">
+    <div className="playground">
+      <form
+        className="form-row"
+        onSubmit={(event) => {
+          event.preventDefault();
+          void loadFromUrl();
+        }}
+      >
         <input
           type="text"
           value={input}
@@ -94,33 +100,63 @@ export const PlaygroundClient = () => {
           placeholder="https://docs.google.com/forms/d/e/.../viewform or bare form id"
           aria-label="Google Form URL or id"
         />
-        <button
-          type="button"
-          className="btn"
-          onClick={() => {
-            return void loadFromUrl();
-          }}
-          disabled={loading}
-        >
+        <button type="submit" className="btn" disabled={loading}>
           {loading ? "Loading…" : "Load schema"}
         </button>
         <button type="button" className="btn secondary" onClick={loadExample}>
           Load example
         </button>
-      </div>
+      </form>
 
-      {error && <div className="error-box">{error}</div>}
+      {error && (
+        <div className="error-box" role="alert">
+          {error}
+        </div>
+      )}
+
+      {!schema && !error && (
+        <div className="empty-state">
+          <p>
+            Your form&apos;s questions, entry ids and generated code will show
+            up here.
+          </p>
+        </div>
+      )}
 
       {schema && generated && (
         <div className="playground-grid two-col">
           <div>
             <h2>Generated output</h2>
-            <div className="tabs">
+            <div
+              className="tabs"
+              role="tablist"
+              aria-label="Output format"
+              onKeyDown={(event) => {
+                const step =
+                  event.key === "ArrowRight"
+                    ? 1
+                    : event.key === "ArrowLeft"
+                      ? -1
+                      : 0;
+                if (!step) return;
+                const index = TABS.findIndex((t) => {
+                  return t.id === tab;
+                });
+                const next = TABS[(index + step + TABS.length) % TABS.length];
+                if (!next) return;
+                setTab(next.id);
+                document.getElementById(`tab-${next.id}`)?.focus();
+              }}
+            >
               {TABS.map((t) => {
                 return (
                   <button
                     key={t.id}
                     type="button"
+                    role="tab"
+                    id={`tab-${t.id}`}
+                    aria-selected={tab === t.id}
+                    tabIndex={tab === t.id ? 0 : -1}
                     className={
                       tab === t.id ? "tab-button active" : "tab-button"
                     }
@@ -143,7 +179,7 @@ export const PlaygroundClient = () => {
 
           <div>
             <h2>Live form</h2>
-            <p style={{ color: "var(--muted)" }}>
+            <p className="playground-note">
               Rendered from the parsed schema via <code>useGoogleForm</code>.
               Submitting uses <code>mode: &quot;no-cors&quot;</code>, so a
               successful-looking &quot;sent&quot; status doesn&apos;t confirm

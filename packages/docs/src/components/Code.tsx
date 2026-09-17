@@ -26,7 +26,7 @@ export const Code = ({ children, language, filename }: CodeProps) => {
       <div className="code-block-header">
         <span>{filename ?? language ?? "code"}</span>
         <button type="button" onClick={onCopy} className="copy-button">
-          {copied ? "Copied!" : "Copy"}
+          {copied ? "Copied" : "Copy"}
         </button>
       </div>
       <pre>
