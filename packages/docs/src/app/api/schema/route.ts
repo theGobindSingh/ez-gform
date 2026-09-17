@@ -19,7 +19,7 @@ const FETCH_TIMEOUT_MS = 10_000;
  * page to unrecognized clients), parses it with `@ez-gform/core`'s
  * `parseFormHtml`, and returns the resulting `FormSchema` as JSON.
  */
-export async function GET(request: Request): Promise<NextResponse> {
+export const GET = async (request: Request): Promise<NextResponse> => {
   const url = new URL(request.url);
   const rawFormId = url.searchParams.get("formId");
 
@@ -106,4 +106,4 @@ export async function GET(request: Request): Promise<NextResponse> {
       { status: 422 },
     );
   }
-}
+};

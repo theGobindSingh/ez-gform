@@ -46,9 +46,14 @@ describe("generateTypes", () => {
 
   it("uses a checkboxes-with-other type when the question has an Other option", () => {
     const schema = loadFixtureSchema("question-types-demo");
-    const checkboxWithOther = schema.questions.find(
-      (q) => q.type === "checkboxes" && q.options?.some((o) => o.isOther),
-    );
+    const checkboxWithOther = schema.questions.find((q) => {
+      return (
+        q.type === "checkboxes" &&
+        q.options?.some((o) => {
+          return o.isOther;
+        })
+      );
+    });
     if (!checkboxWithOther) return;
     const source = generateTypes(schema);
     expect(source).toContain(

@@ -36,12 +36,11 @@ const NAV: NavGroup[] = [
       { href: "/packages/react", label: "@ez-gform/react" },
       { href: "/packages/codegen", label: "@ez-gform/codegen" },
       { href: "/packages/cli", label: "@ez-gform/cli" },
-      { href: "/packages/extension", label: "@ez-gform/extension" },
     ],
   },
 ];
 
-export function Sidebar() {
+export const Sidebar = () => {
   const pathname = usePathname();
 
   return (
@@ -49,29 +48,33 @@ export function Sidebar() {
       <Link href="/" className="sidebar-brand">
         ez-gform
       </Link>
-      {NAV.map((group) => (
-        <div className="sidebar-group" key={group.title}>
-          <p className="sidebar-group-title">{group.title}</p>
-          <ul>
-            {group.items.map((item) => {
-              const active =
-                pathname === item.href ||
-                (item.href !== "/" && pathname.startsWith(`${item.href}/`));
-              return (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className={active ? "sidebar-link active" : "sidebar-link"}
-                    aria-current={active ? "page" : undefined}
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      ))}
+      {NAV.map((group) => {
+        return (
+          <div className="sidebar-group" key={group.title}>
+            <p className="sidebar-group-title">{group.title}</p>
+            <ul>
+              {group.items.map((item) => {
+                const active =
+                  pathname === item.href ||
+                  (item.href !== "/" && pathname.startsWith(`${item.href}/`));
+                return (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      className={
+                        active ? "sidebar-link active" : "sidebar-link"
+                      }
+                      aria-current={active ? "page" : undefined}
+                    >
+                      {item.label}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        );
+      })}
       <a
         className="sidebar-external"
         href="https://github.com/webadeva/ez-gform"
@@ -82,4 +85,4 @@ export function Sidebar() {
       </a>
     </nav>
   );
-}
+};

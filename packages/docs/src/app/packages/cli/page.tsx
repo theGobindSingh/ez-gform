@@ -12,7 +12,7 @@ export default function CliPackagePage() {
       <p>
         <code>npx</code> tool: fetch a public Google Form and emit a JSON
         schema, TypeScript types, a paste-ready React component, or a plain HTML
-        form — the non-extension path for getting <code>entry.*</code> ids and
+        form — the scripting/CI path for getting <code>entry.*</code> ids and
         generated code.
       </p>
 

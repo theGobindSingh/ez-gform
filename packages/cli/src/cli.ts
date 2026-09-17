@@ -238,7 +238,9 @@ const runSubmit = async (argv: string[]): Promise<number> => {
   if (!validation.ok) {
     process.stderr.write(
       `Validation failed:\n${validation.errors
-        .map((e) => `  - ${e.entryId}: ${e.message}`)
+        .map((e) => {
+          return `  - ${e.entryId}: ${e.message}`;
+        })
         .join("\n")}\n`,
     );
     return 2;

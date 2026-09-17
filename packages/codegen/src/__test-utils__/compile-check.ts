@@ -84,10 +84,13 @@ export const typeCheck = (
     return originalGetSourceFile(name, languageVersion, ...rest);
   };
   const originalFileExists = host.fileExists.bind(host);
-  host.fileExists = (name) => name === fileName || originalFileExists(name);
+  host.fileExists = (name) => {
+    return name === fileName || originalFileExists(name);
+  };
   const originalReadFile = host.readFile.bind(host);
-  host.readFile = (name) =>
-    name === fileName ? source : originalReadFile(name);
+  host.readFile = (name) => {
+    return name === fileName ? source : originalReadFile(name);
+  };
 
   const program = ts.createProgram([fileName], compilerOptions, host);
   const diagnostics = ts.getPreEmitDiagnostics(program);

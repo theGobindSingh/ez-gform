@@ -132,13 +132,11 @@ const reducer = (state: State, action: Action): State => {
 /**
  * Submits a controlled-values form to a Google Form, exposing an explicit
  * `status` state machine (`idle` → `validating`? → `submitting` →
- * `sent`/`ok`/`error`) and a promise-returning `submit`, instead of the
- * legacy hook's fire-and-forget DOM read. See `useEasyGoogleForm` for a
- * compat shim over the old API.
+ * `sent`/`ok`/`error`) and a promise-returning `submit`.
  */
-export function useGoogleForm(
+export const useGoogleForm = (
   options: UseGoogleFormOptions,
-): UseGoogleFormReturn {
+): UseGoogleFormReturn => {
   const {
     formId,
     schema,
@@ -335,4 +333,4 @@ export function useGoogleForm(
     registerCheckbox,
     prefillUrl,
   };
-}
+};

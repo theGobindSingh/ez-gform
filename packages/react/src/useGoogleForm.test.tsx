@@ -244,7 +244,7 @@ describe("useGoogleForm status transitions", () => {
   });
 });
 
-function TextFieldTestForm() {
+const TextFieldTestForm = () => {
   const { register, values } = useGoogleForm({
     formId: FORM_ID,
     initialValues: { "entry.1": "" },
@@ -258,9 +258,9 @@ function TextFieldTestForm() {
       </output>
     </form>
   );
-}
+};
 
-function CheckboxTestForm() {
+const CheckboxTestForm = () => {
   const { registerCheckbox, values } = useGoogleForm({
     formId: FORM_ID,
     initialValues: { "entry.2": [] },
@@ -280,7 +280,7 @@ function CheckboxTestForm() {
       <output data-testid="out">{JSON.stringify(values["entry.2"])}</output>
     </form>
   );
-}
+};
 
 describe("useGoogleForm register / registerCheckbox wiring", () => {
   it("register() wires a text input's value/onChange through a real <form>", async () => {

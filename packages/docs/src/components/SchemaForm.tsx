@@ -40,13 +40,13 @@ const isTimeValue = (value: unknown): value is TimeValue => {
   );
 };
 
-function ShortAnswerField({
+const ShortAnswerField = ({
   question,
   form,
 }: {
   question: Question;
   form: UseGoogleFormReturn;
-}) {
+}) => {
   const multiline = question.type === "paragraph";
   const field = form.register(question.entryId);
   return (
@@ -62,9 +62,9 @@ function ShortAnswerField({
       )}
     </div>
   );
-}
+};
 
-function ChoiceOtherInput({
+const ChoiceOtherInput = ({
   entryId,
   option,
   currentValue,
@@ -78,7 +78,7 @@ function ChoiceOtherInput({
   onSelectOther: () => void;
   onOtherTextChange: (text: string) => void;
   inputType: "radio" | "checkbox";
-}) {
+}) => {
   const otherText = isOtherValue(currentValue) ? currentValue.other : "";
   const isSelected = isOtherValue(currentValue);
   return (
@@ -100,15 +100,15 @@ function ChoiceOtherInput({
       />
     </div>
   );
-}
+};
 
-function RadioField({
+const RadioField = ({
   question,
   form,
 }: {
   question: Question;
   form: UseGoogleFormReturn;
-}) {
+}) => {
   const currentValue = form.values[question.entryId];
   const options = question.options ?? [];
   return (
@@ -152,15 +152,15 @@ function RadioField({
       })}
     </div>
   );
-}
+};
 
-function DropdownField({
+const DropdownField = ({
   question,
   form,
 }: {
   question: Question;
   form: UseGoogleFormReturn;
-}) {
+}) => {
   const currentValue = form.values[question.entryId];
   const stringValue = typeof currentValue === "string" ? currentValue : "";
   const options = question.options ?? [];
@@ -179,31 +179,37 @@ function DropdownField({
       >
         <option value="">Select…</option>
         {options
-          .filter((option) => !option.isOther)
-          .map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.value}
-            </option>
-          ))}
+          .filter((option) => {
+            return !option.isOther;
+          })
+          .map((option) => {
+            return (
+              <option key={option.value} value={option.value}>
+                {option.value}
+              </option>
+            );
+          })}
       </select>
     </div>
   );
-}
+};
 
-function CheckboxesField({
+const CheckboxesField = ({
   question,
   form,
 }: {
   question: Question;
   form: UseGoogleFormReturn;
-}) {
+}) => {
   const currentValue = form.values[question.entryId];
   const list = Array.isArray(currentValue) ? currentValue : [];
   const otherEntry = list.find(isOtherValue);
   const options = question.options ?? [];
 
   const setOther = (patch: Partial<{ selected: boolean; text: string }>) => {
-    const withoutOther = list.filter((entry) => !isOtherValue(entry));
+    const withoutOther = list.filter((entry) => {
+      return !isOtherValue(entry);
+    });
     const selected = patch.selected ?? Boolean(otherEntry);
     if (!selected) {
       form.setValue(question.entryId, withoutOther);
@@ -259,22 +265,21 @@ function CheckboxesField({
       })}
     </div>
   );
-}
+};
 
-function LinearScaleField({
+const LinearScaleField = ({
   question,
   form,
 }: {
   question: Question;
   form: UseGoogleFormReturn;
-}) {
+}) => {
   const currentValue = form.values[question.entryId];
   const min = question.scale?.min ?? 1;
   const max = question.scale?.max ?? 5;
-  const points = Array.from(
-    { length: max - min + 1 },
-    (_, index) => min + index,
-  );
+  const points = Array.from({ length: max - min + 1 }, (_, index) => {
+    return min + index;
+  });
   return (
     <div className="field">
       <label>
@@ -283,32 +288,34 @@ function LinearScaleField({
       </label>
       <div className="option">
         {question.scale?.lowLabel && <span>{question.scale.lowLabel}</span>}
-        {points.map((point) => (
-          <label key={point} style={{ marginRight: "0.5rem" }}>
-            <input
-              type="radio"
-              name={question.entryId}
-              checked={currentValue === point}
-              onChange={() => {
-                form.setValue(question.entryId, point);
-              }}
-            />
-            {point}
-          </label>
-        ))}
+        {points.map((point) => {
+          return (
+            <label key={point} style={{ marginRight: "0.5rem" }}>
+              <input
+                type="radio"
+                name={question.entryId}
+                checked={currentValue === point}
+                onChange={() => {
+                  form.setValue(question.entryId, point);
+                }}
+              />
+              {point}
+            </label>
+          );
+        })}
         {question.scale?.highLabel && <span>{question.scale.highLabel}</span>}
       </div>
     </div>
   );
-}
+};
 
-function DateField({
+const DateField = ({
   question,
   form,
 }: {
   question: Question;
   form: UseGoogleFormReturn;
-}) {
+}) => {
   const currentValue = form.values[question.entryId];
   const dateValue = isDateValue(currentValue) ? currentValue : undefined;
   const includeTime = question.date?.includeTime ?? false;
@@ -380,15 +387,15 @@ function DateField({
       </div>
     </div>
   );
-}
+};
 
-function TimeField({
+const TimeField = ({
   question,
   form,
 }: {
   question: Question;
   form: UseGoogleFormReturn;
-}) {
+}) => {
   const currentValue = form.values[question.entryId];
   const timeValue = isTimeValue(currentValue) ? currentValue : undefined;
 
@@ -425,15 +432,15 @@ function TimeField({
       </div>
     </div>
   );
-}
+};
 
-function GridField({
+const GridField = ({
   question,
   form,
 }: {
   question: Question;
   form: UseGoogleFormReturn;
-}) {
+}) => {
   const isCheckboxGrid = question.type === "checkbox_grid";
   const columns = question.options ?? [];
   const rows = question.rows ?? [];
@@ -448,9 +455,9 @@ function GridField({
         <thead>
           <tr>
             <th />
-            {columns.map((col) => (
-              <th key={col.value}>{col.value}</th>
-            ))}
+            {columns.map((col) => {
+              return <th key={col.value}>{col.value}</th>;
+            })}
           </tr>
         </thead>
         <tbody>
@@ -471,7 +478,9 @@ function GridField({
                           onChange={(event) => {
                             const next = event.target.checked
                               ? [...list, col.value]
-                              : list.filter((v) => v !== col.value);
+                              : list.filter((v) => {
+                                  return v !== col.value;
+                                });
                             form.setValue(row.entryId, next);
                           }}
                         />
@@ -498,15 +507,15 @@ function GridField({
       </table>
     </div>
   );
-}
+};
 
-function QuestionField({
+const QuestionField = ({
   question,
   form,
 }: {
   question: Question;
   form: UseGoogleFormReturn;
-}) {
+}) => {
   switch (question.type) {
     case "short_answer":
     case "paragraph":
@@ -539,10 +548,10 @@ function QuestionField({
     default:
       return null;
   }
-}
+};
 
 /** Renders every question in a `FormSchema`, wired to `useGoogleForm`, with a submit button and prefill link. */
-export function SchemaForm({ schema }: SchemaFormProps) {
+export const SchemaForm = ({ schema }: SchemaFormProps) => {
   const form = useGoogleForm({ formId: schema.formId, schema });
 
   return (
@@ -552,9 +561,11 @@ export function SchemaForm({ schema }: SchemaFormProps) {
       }}
       aria-label={schema.title || "Google Form"}
     >
-      {schema.questions.map((question) => (
-        <QuestionField key={question.id} question={question} form={form} />
-      ))}
+      {schema.questions.map((question) => {
+        return (
+          <QuestionField key={question.id} question={question} form={form} />
+        );
+      })}
 
       <div className="form-row">
         <button type="submit" className="btn" disabled={form.isSubmitting}>
@@ -568,9 +579,9 @@ export function SchemaForm({ schema }: SchemaFormProps) {
       {form.errors.length > 0 && (
         <div className="error-box">
           <ul>
-            {form.errors.map((error) => (
-              <li key={error.entryId}>{error.message}</li>
-            ))}
+            {form.errors.map((error) => {
+              return <li key={error.entryId}>{error.message}</li>;
+            })}
           </ul>
         </div>
       )}
@@ -584,4 +595,4 @@ export function SchemaForm({ schema }: SchemaFormProps) {
       )}
     </form>
   );
-}
+};

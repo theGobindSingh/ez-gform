@@ -1,8 +1,7 @@
 # @ez-gform/core
 
 Framework-agnostic Google Forms parser, entry encoder, and submitter. Zero
-runtime dependencies; works in Node 20+, browsers, and extension content
-scripts (no DOM access).
+runtime dependencies; works in Node 20+ and browsers (no DOM access).
 
 ## Install
 

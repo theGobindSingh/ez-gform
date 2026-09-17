@@ -22,7 +22,7 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "html", label: "html" },
 ];
 
-export function PlaygroundClient() {
+export const PlaygroundClient = () => {
   const [input, setInput] = useState("");
   const [schema, setSchema] = useState<FormSchema | null>(null);
   const [loading, setLoading] = useState(false);
@@ -97,7 +97,9 @@ export function PlaygroundClient() {
         <button
           type="button"
           className="btn"
-          onClick={() => void loadFromUrl()}
+          onClick={() => {
+            return void loadFromUrl();
+          }}
           disabled={loading}
         >
           {loading ? "Loading…" : "Load schema"}
@@ -114,18 +116,22 @@ export function PlaygroundClient() {
           <div>
             <h2>Generated output</h2>
             <div className="tabs">
-              {TABS.map((t) => (
-                <button
-                  key={t.id}
-                  type="button"
-                  className={tab === t.id ? "tab-button active" : "tab-button"}
-                  onClick={() => {
-                    setTab(t.id);
-                  }}
-                >
-                  {t.label}
-                </button>
-              ))}
+              {TABS.map((t) => {
+                return (
+                  <button
+                    key={t.id}
+                    type="button"
+                    className={
+                      tab === t.id ? "tab-button active" : "tab-button"
+                    }
+                    onClick={() => {
+                      setTab(t.id);
+                    }}
+                  >
+                    {t.label}
+                  </button>
+                );
+              })}
             </div>
             <Code
               language={tab}
@@ -149,4 +155,4 @@ export function PlaygroundClient() {
       )}
     </div>
   );
-}
+};

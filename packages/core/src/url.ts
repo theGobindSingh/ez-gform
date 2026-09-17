@@ -56,13 +56,15 @@ export const normalizeFormId = (input: string): string => {
   return trimmed;
 };
 
-export function formUrls(formId: string): {
+export const formUrls = (
+  formId: string,
+): {
   viewform: string;
   formResponse: string;
-} {
+} => {
   const id = normalizeFormId(formId);
   return {
     viewform: `https://docs.google.com/forms/d/e/${id}/viewform`,
     formResponse: `https://docs.google.com/forms/d/e/${id}/formResponse`,
   };
-}
+};

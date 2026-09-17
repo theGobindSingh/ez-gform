@@ -18,13 +18,21 @@ const JSX_TEXT_ESCAPES: Record<string, string> = {
 
 /** Escapes text so it's safe to drop directly into JSX element children. */
 const jsxEscape = (value: string): string => {
-  return value.replace(/[&<>{}]/g, (ch) => JSX_TEXT_ESCAPES[ch]!);
+  return value.replace(/[&<>{}]/g, (ch) => {
+    return JSX_TEXT_ESCAPES[ch]!;
+  });
 };
 
-const q = (value: string): string => JSON.stringify(value);
+const q = (value: string): string => {
+  return JSON.stringify(value);
+};
 
 const hasOtherOption = (question: Question): boolean => {
-  return question.options?.some((option) => option.isOther) ?? false;
+  return (
+    question.options?.some((option) => {
+      return option.isOther;
+    }) ?? false
+  );
 };
 
 const renderShortText = (question: Question, multiline: boolean): string => {
@@ -144,7 +152,9 @@ const renderGrid = (question: Question): string => {
   const isCheckbox = question.type === "checkbox_grid";
   const columns = question.options ?? [];
   const headerCells = columns
-    .map((col) => `<th key={${q(col.value)}}>${jsxEscape(col.value)}</th>`)
+    .map((col) => {
+      return `<th key={${q(col.value)}}>${jsxEscape(col.value)}</th>`;
+    })
     .join("\n              ");
   const rows = (question.rows ?? [])
     .map((row) => {
@@ -274,16 +284,23 @@ const renderSection = (
     ? `    <p>${jsxEscape(section.description)}</p>\n`
     : "";
   const body = section.questionIds
-    .map((id) => questionsById.get(id))
-    .filter((question): question is Question => question !== undefined)
+    .map((id) => {
+      return questionsById.get(id);
+    })
+    .filter((question): question is Question => {
+      return question !== undefined;
+    })
     .map(renderQuestion)
     .join("\n");
   return `${heading}${description}${body}`;
 };
 
-const usesOther = (question: Question): boolean =>
-  hasOtherOption(question) &&
-  (question.type === "multiple_choice" || question.type === "checkboxes");
+const usesOther = (question: Question): boolean => {
+  return (
+    hasOtherOption(question) &&
+    (question.type === "multiple_choice" || question.type === "checkboxes")
+  );
+};
 
 /**
  * Generates a paste-ready React component wired to `useGoogleForm` from
@@ -300,12 +317,18 @@ export const generateReactComponent = (
   const schemaJson = JSON.stringify(schema, null, 2);
   void usesOther;
 
-  const questionsById = new Map(schema.questions.map((qn) => [qn.id, qn]));
+  const questionsById = new Map(
+    schema.questions.map((qn) => {
+      return [qn.id, qn];
+    }),
+  );
   const body =
     schema.sections.length > 1 ||
     (schema.sections[0]?.title && schema.sections[0].title.length > 0)
       ? schema.sections
-          .map((section) => renderSection(section, questionsById))
+          .map((section) => {
+            return renderSection(section, questionsById);
+          })
           .join("\n")
       : schema.questions.map(renderQuestion).join("\n");
 

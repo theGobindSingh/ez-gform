@@ -60,8 +60,8 @@ export default function FindingYourFormPage() {
       <h2>3. Get each field&apos;s entry id</h2>
       <p>
         Every input on a Google Form has a hidden <code>entry.NNNNNNNN</code>{" "}
-        submission id. You never need to hunt for these by hand — three tools
-        automate it, all built on <code>@ez-gform/core</code>&apos;s{" "}
+        submission id. You never need to hunt for these by hand — two tools
+        automate it, both built on <code>@ez-gform/core</code>&apos;s{" "}
         <code>parseFormHtml</code>, which reads the form&apos;s embedded{" "}
         <code>FB_PUBLIC_LOAD_DATA_</code> JSON blob (the same structured data
         Google&apos;s own client renders from) instead of scraping obfuscated
@@ -77,13 +77,9 @@ export default function FindingYourFormPage() {
           The <Link href="/packages/cli">CLI</Link> —{" "}
           <code>npx @ez-gform/cli &lt;form-url&gt;</code> for scripting/CI.
         </li>
-        <li>
-          The <Link href="/packages/extension">browser extension</Link> — a
-          popup that shows the schema for whatever form tab is open.
-        </li>
       </ul>
       <p>
-        All three return the same <code>FormSchema</code> type from{" "}
+        Both return the same <code>FormSchema</code> type from{" "}
         <code>@ez-gform/types</code>, so there&apos;s no drift between whichever
         tool you used and what <code>@ez-gform/react</code> expects at runtime.
       </p>

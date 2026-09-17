@@ -20,22 +20,6 @@
       "name": "📝 @ez-gform/docs",
       "path": "packages/docs",
     },
-    {
-      "name": "🧩 @ez-gform/background",
-      "path": "packages/background",
-    },
-    {
-      "name": "🧩 @ez-gform/content-script",
-      "path": "packages/content-script",
-    },
-    {
-      "name": "🧩 @ez-gform/popup",
-      "path": "packages/popup",
-    },
-    {
-      "name": "🧩 @ez-gform/extension",
-      "path": "packages/extension",
-    },
   ],
   "settings": {
     "eslint.useFlatConfig": true,

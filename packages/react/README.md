@@ -67,36 +67,3 @@ outcome.
 Also returned: `values`, `setValue`, `setValues`, `reset`, `result`,
 `prefillUrl` (a `/viewform?usp=pp_url&...` link prefilled with the current
 values).
-
-## `useEasyGoogleForm` (deprecated compat shim)
-
-Matches the legacy `use-easy-google-form` hook's `formRef`/`gFormId`/`links`
-DOM-scraping signature, so existing consumers can migrate by changing only
-the import:
-
-```tsx
-import useEasyGoogleForm from "@ez-gform/react"; // default export, drop-in
-// or: import { useEasyGoogleForm } from "@ez-gform/react";
-
-function LegacyForm() {
-  const formRef = useRef<HTMLFormElement>(null);
-  const onSubmit = useEasyGoogleForm({
-    formRef,
-    gFormId: "1FAIpQLS...",
-    links: [{ entryId: "entry.111", formId: "name", type: "text" }],
-  });
-
-  return (
-    <form ref={formRef} onSubmit={onSubmit}>
-      <input id="name" />
-      <button type="submit">Submit</button>
-    </form>
-  );
-}
-```
-
-Unlike the legacy hook, `onSubmit` **returns a promise that resolves with the
-`SubmitResult`** instead of firing the request and forgetting about it, and
-CSS id selectors are escaped internally (ids with spaces/leading digits no
-longer throw). New code should prefer `useGoogleForm`, which takes a plain
-values object instead of reading the DOM by id.

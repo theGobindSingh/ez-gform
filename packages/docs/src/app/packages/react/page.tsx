@@ -36,24 +36,6 @@ function ContactForm({ schema }: { schema: FormSchema }) {
   );
 }`;
 
-const compatExample = `import useEasyGoogleForm from "@ez-gform/react"; // default export, drop-in
-
-function LegacyForm() {
-  const formRef = useRef<HTMLFormElement>(null);
-  const onSubmit = useEasyGoogleForm({
-    formRef,
-    gFormId: "1FAIpQLS...",
-    links: [{ entryId: "entry.111", formId: "name", type: "text" }],
-  });
-
-  return (
-    <form ref={formRef} onSubmit={onSubmit}>
-      <input id="name" />
-      <button type="submit">Submit</button>
-    </form>
-  );
-}`;
-
 export default function ReactPackagePage() {
   return (
     <div>
@@ -98,25 +80,6 @@ export default function ReactPackagePage() {
         <code>setValues</code>, <code>reset</code>, <code>result</code>,{" "}
         <code>prefillUrl</code> (a <code>/viewform?usp=pp_url&amp;...</code>{" "}
         link prefilled with the current values).
-      </p>
-
-      <h2>useEasyGoogleForm migration (deprecated compat shim)</h2>
-      <p>
-        Matches the legacy <code>use-easy-google-form</code> hook&apos;s{" "}
-        <code>formRef</code>/<code>gFormId</code>/<code>links</code>{" "}
-        DOM-scraping signature, so existing consumers can migrate by changing
-        only the import:
-      </p>
-      <Code language="tsx">{compatExample}</Code>
-      <p>
-        Unlike the legacy hook, <code>onSubmit</code>{" "}
-        <strong>
-          returns a promise that resolves with the <code>SubmitResult</code>
-        </strong>{" "}
-        instead of firing the request and forgetting about it, and CSS id
-        selectors are escaped internally (ids with spaces/leading digits no
-        longer throw). New code should prefer <code>useGoogleForm</code>, which
-        takes a plain values object instead of reading the DOM by id.
       </p>
     </div>
   );

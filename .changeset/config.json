@@ -7,11 +7,5 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": [
-    "@ez-gform/docs",
-    "@ez-gform/background",
-    "@ez-gform/content-script",
-    "@ez-gform/popup",
-    "@ez-gform/extension"
-  ]
+  "ignore": ["@ez-gform/docs"]
 }

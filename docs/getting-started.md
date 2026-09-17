@@ -11,7 +11,4 @@
   `packages/core/README.md` for the parser/encoder/submit API directly.
 - **Finding your form's `entry.*` ids without either of the above**: run
   `npx @ez-gform/cli <google-form-url>` (see `packages/cli/README.md`), or
-  build and load the browser extension —
-  `pnpm --filter @ez-gform/extension build`, then load
-  `packages/extension/dist` unpacked (Chrome only for now; see
-  `packages/extension/README.md`).
+  use the interactive playground linked above.

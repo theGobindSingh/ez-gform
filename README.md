@@ -4,7 +4,7 @@ Submit your own custom React/HTML form to a Google Form with no backend. ez-gfor
 form's fields to a Google Form's entries and posts directly to Google's endpoint, so you get
 free, serverless form submission and response collection in a Google Sheet. This monorepo
 contains the core mapping/submission library, a React binding, a CLI for discovering Google
-Form field IDs, a browser extension to help you inspect forms, and the project docs site.
+Form field IDs, and the project docs site.
 
 ## Packages
 
@@ -12,7 +12,7 @@ Published to npm:
 
 | Package             | Description                                                               |
 | ------------------- | ------------------------------------------------------------------------- |
-| `@ez-gform/types`   | Shared TypeScript types (schema, values, submit, codegen, messages)       |
+| `@ez-gform/types`   | Shared TypeScript types (schema, values, submit, codegen)                 |
 | `@ez-gform/core`    | Framework-agnostic core: builds and submits form payloads to Google Forms |
 | `@ez-gform/react`   | React hooks/components built on `@ez-gform/core`                          |
 | `@ez-gform/codegen` | Pure code generators (JSON schema, TS types, React component, HTML form)  |
@@ -20,13 +20,9 @@ Published to npm:
 
 Private apps (not published):
 
-| Package                    | Description                                                                           |
-| -------------------------- | ------------------------------------------------------------------------------------- |
-| `@ez-gform/background`     | MV3 service worker relaying popup <-> content-script messages                         |
-| `@ez-gform/content-script` | Fetches/reads a Google Form's HTML for the popup to parse                             |
-| `@ez-gform/popup`          | Extension popup UI: parses the active tab's form, generates paste-ready code          |
-| `@ez-gform/extension`      | Assembles `background`/`content-script`/`popup` into a loadable `dist/` (Chrome, MV3) |
-| `@ez-gform/docs`           | Documentation site and interactive playground (Next.js App Router)                    |
+| Package          | Description                                                        |
+| ---------------- | ------------------------------------------------------------------ |
+| `@ez-gform/docs` | Documentation site and interactive playground (Next.js App Router) |
 
 ## Development
 
@@ -75,19 +71,13 @@ function ContactForm({ schema }) {
 }
 ```
 
-See `packages/react/README.md` for the full API, including the
-`useEasyGoogleForm` legacy compat shim.
+See `packages/react/README.md` for the full API.
 
 ## CLI
 
 ```sh
 npx @ez-gform/cli <google-form-url>
 ```
-
-## Browser extension
-
-Build and load unpacked; see `packages/extension/README.md` for the full
-walkthrough (Chrome-only for now — see `docs/ARCHITECTURE.md`).
 
 ## Docs
 

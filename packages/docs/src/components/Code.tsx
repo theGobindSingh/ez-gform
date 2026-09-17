@@ -9,13 +9,15 @@ export interface CodeProps {
 }
 
 /** A `<pre>` code block with a copy-to-clipboard button. No syntax highlighting dependency required. */
-export function Code({ children, language, filename }: CodeProps) {
+export const Code = ({ children, language, filename }: CodeProps) => {
   const [copied, setCopied] = useState(false);
 
   const onCopy = () => {
     void navigator.clipboard.writeText(children).then(() => {
       setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
+      setTimeout(() => {
+        return setCopied(false);
+      }, 1500);
     });
   };
 
@@ -32,4 +34,4 @@ export function Code({ children, language, filename }: CodeProps) {
       </pre>
     </div>
   );
-}
+};

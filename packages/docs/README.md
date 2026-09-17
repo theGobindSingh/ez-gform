@@ -22,8 +22,8 @@ pnpm turbo run build test lint type-check --filter=@ez-gform/docs
 - `/getting-started` — install, minimal React example, plain HTML example.
 - `/guides/finding-your-form` — how to get a form's URL/ID and make it public.
 - `/guides/question-types` — every `QuestionType` → `FieldValue` → wire format.
-- `/packages/core`, `/packages/react`, `/packages/codegen`, `/packages/cli`,
-  `/packages/extension` — per-package API reference.
+- `/packages/core`, `/packages/react`, `/packages/codegen`, `/packages/cli` —
+  per-package API reference.
 - `/playground` — paste a public form URL/ID (or click "Load example" to use
   a bundled offline fixture) to see the parsed schema, generated
   json/types/react/html output, and a live form built with

@@ -12,7 +12,9 @@ const fixturesDir = fileURLToPath(
   new URL("../../core/src/__fixtures__/", import.meta.url),
 );
 
-const fixturePath = (slug: string): string => `${fixturesDir}${slug}.json`;
+const fixturePath = (slug: string): string => {
+  return `${fixturesDir}${slug}.json`;
+};
 
 const run = async (
   args: string[],

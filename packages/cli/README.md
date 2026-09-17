@@ -2,7 +2,7 @@
 
 `npx` tool: fetch a public Google Form and emit a JSON schema, TypeScript
 types, a paste-ready React component, or a plain HTML form — the
-non-extension path for getting `entry.*` ids and generated code.
+scripting/CI path for getting `entry.*` ids and generated code.
 
 ## Usage
 

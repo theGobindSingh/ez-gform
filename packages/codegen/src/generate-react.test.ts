@@ -31,9 +31,9 @@ describe("generateReactComponent", () => {
 
   it("renders a disabled note for file_upload questions", () => {
     const schema = loadFixtureSchema("question-types-demo");
-    const hasFileUpload = schema.questions.some(
-      (q) => q.type === "file_upload",
-    );
+    const hasFileUpload = schema.questions.some((q) => {
+      return q.type === "file_upload";
+    });
     const source = generateReactComponent(schema);
     if (hasFileUpload) {
       expect(source).toContain("not supported by Google Forms submission");

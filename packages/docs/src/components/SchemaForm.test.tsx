@@ -31,7 +31,12 @@ describe("SchemaForm", () => {
   it("renders radio options for multiple_choice questions, including Other", () => {
     render(<SchemaForm schema={schema} />);
     const question = schema.questions.find((q) => {
-      return q.type === "multiple_choice" && q.options?.some((o) => o.isOther);
+      return (
+        q.type === "multiple_choice" &&
+        q.options?.some((o) => {
+          return o.isOther;
+        })
+      );
     });
     expect(question).toBeDefined();
     expect(screen.getByText(question!.title)).toBeDefined();
@@ -51,7 +56,9 @@ describe("SchemaForm", () => {
 
   it("renders date fields with month/day inputs", () => {
     render(<SchemaForm schema={schema} />);
-    const dateQuestion = schema.questions.find((q) => q.type === "date");
+    const dateQuestion = schema.questions.find((q) => {
+      return q.type === "date";
+    });
     expect(dateQuestion).toBeDefined();
     expect(screen.getAllByLabelText("Month").length).toBeGreaterThan(0);
     expect(screen.getAllByLabelText("Day").length).toBeGreaterThan(0);
@@ -59,9 +66,13 @@ describe("SchemaForm", () => {
 
   it("renders a checkbox per option for checkboxes questions", () => {
     render(<SchemaForm schema={schema} />);
-    const question = schema.questions.find((q) => q.type === "checkboxes");
+    const question = schema.questions.find((q) => {
+      return q.type === "checkboxes";
+    });
     expect(question).toBeDefined();
-    const nonOtherOptions = (question!.options ?? []).filter((o) => !o.isOther);
+    const nonOtherOptions = (question!.options ?? []).filter((o) => {
+      return !o.isOther;
+    });
     for (const option of nonOtherOptions) {
       expect(screen.getByText(option.value)).toBeDefined();
     }

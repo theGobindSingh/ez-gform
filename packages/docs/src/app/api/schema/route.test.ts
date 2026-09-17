@@ -31,13 +31,12 @@ describe("GET /api/schema — input validation", () => {
     // fetch step at all, proving validation didn't reject a well-formed id.
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockImplementation(
-        () =>
-          new Response("<html></html>", {
-            status: 200,
-            headers: { "content-type": "text/html" },
-          }),
-      ),
+      vi.fn().mockImplementation(() => {
+        return new Response("<html></html>", {
+          status: 200,
+          headers: { "content-type": "text/html" },
+        });
+      }),
     );
 
     const bareId = await GET(

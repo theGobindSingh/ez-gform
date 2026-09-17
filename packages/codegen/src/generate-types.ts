@@ -12,7 +12,11 @@ const quote = (value: string): string => {
 };
 
 const hasOtherOption = (question: Question): boolean => {
-  return question.options?.some((option) => option.isOther) ?? false;
+  return (
+    question.options?.some((option) => {
+      return option.isOther;
+    }) ?? false
+  );
 };
 
 /** Returns the TS type text for a single question's value, or `undefined` to omit it entirely. */
@@ -36,7 +40,9 @@ const fieldType = (question: Question): string | undefined => {
       return "TimeValue";
     case "grid":
     case "checkbox_grid": {
-      const rowIds = (question.rows ?? []).map((row) => quote(row.entryId));
+      const rowIds = (question.rows ?? []).map((row) => {
+        return quote(row.entryId);
+      });
       const keyType = rowIds.length > 0 ? rowIds.join(" | ") : "string";
       return `Record<${keyType}, string | string[]>`;
     }
@@ -61,12 +67,18 @@ export const generateTypes = (
   const name = options.name ?? toPascalCase(schema.title);
   const schemaJson = JSON.stringify(schema, null, 2);
 
-  const usesDate = schema.questions.some((q) => q.type === "date");
-  const usesTime = schema.questions.some((q) => q.type === "time");
+  const usesDate = schema.questions.some((q) => {
+    return q.type === "date";
+  });
+  const usesTime = schema.questions.some((q) => {
+    return q.type === "time";
+  });
   const extraTypeImports = [
     usesDate ? "DateValue" : undefined,
     usesTime ? "TimeValue" : undefined,
-  ].filter((t): t is string => t !== undefined);
+  ].filter((t): t is string => {
+    return t !== undefined;
+  });
 
   const fields: string[] = [];
   for (const question of schema.questions) {

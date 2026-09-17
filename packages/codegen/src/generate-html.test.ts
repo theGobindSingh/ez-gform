@@ -4,7 +4,11 @@ import { FIXTURE_SLUGS, loadFixtureSchema } from "./__test-utils__/fixtures.js";
 import { generateHtmlForm } from "./generate-html.js";
 
 const hasOtherOption = (question: Question): boolean => {
-  return question.options?.some((o) => o.isOther) ?? false;
+  return (
+    question.options?.some((o) => {
+      return o.isOther;
+    }) ?? false
+  );
 };
 
 /** Every distinct `name=` attribute value the encoder would produce for this schema. */

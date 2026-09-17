@@ -144,10 +144,10 @@ const encodeOne = (
 };
 
 /** Validates `values` against a parsed `FormSchema`: unknown entry ids and missing required questions. */
-export function validateValues(
+export const validateValues = (
   values: FormValues,
   schema: FormSchema,
-): ValidationResult {
+): ValidationResult => {
   const errors: ValidationIssue[] = [];
 
   const knownEntryIds = new Set<string>();
@@ -193,4 +193,4 @@ export function validateValues(
   }
 
   return errors.length === 0 ? { ok: true } : { ok: false, errors };
-}
+};

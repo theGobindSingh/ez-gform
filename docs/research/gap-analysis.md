@@ -171,35 +171,12 @@ codebase as it stands today.
 
 ### `extension`
 
-1. Closed — `packages/content-script` and `packages/popup` parse
-   `FB_PUBLIC_LOAD_DATA_` via `@ez-gform/core`, no CSS-class/`jscontroller`
-   scraping.
-2. Closed — `packages/types`/`packages/core` implement linear scale.
-3. Closed — grid and file upload are recognized types, reported as
-   unsupported-for-submission rather than silently dropped.
-4. Closed — `packages/popup` surfaces explicit error states
-   (not-public/fetch-failed/unsupported-type) instead of relying on
-   ambient cookies with no diagnosis.
-5. Closed — `packages/extension`'s generated `manifest.json` declares
-   `host_permissions` for `docs.google.com`.
-6. Closed — output is a popup UI (`packages/popup`) with a copy button;
-   no DOM injection into the live Forms page.
-7. **Open** — still Chrome-only. The MV3 manifest uses
-   `background.service_worker`, which Firefox's MV3 implementation
-   doesn't fully support yet; no Firefox manifest variant is generated.
-   Documented as a known limitation in `packages/extension/README.md` and
-   `docs/ARCHITECTURE.md`, not silently dropped.
-8. Closed — `/forms/u/N/d/...` URLs are parsed with the `URL` API across
-   `packages/content-script`/`packages/popup`, not regex/string-slicing.
-9. Closed — `pnpm zip` in `packages/extension` produces a release zip;
-   CI can attach it to a tag.
-10. Closed — ids are derived deterministically from `entry.NNNN`, no
-    random `nanoid` per scrape.
-11. Closed — Vitest coverage exists across `background`, `content-script`,
-    `popup`, and `extension` (the manifest-building logic in particular).
-12. Closed — `.github/workflows/` covers this package; Chrome Web
-    Store / Firefox Add-ons submission pipeline itself is not built (no
-    tag-triggered store upload job exists yet) — **open**.
+Not rebuilt — dropped by design. The extension's only job was producing
+`entry.*` ids and paste-ready code, which `packages/cli` and the
+`/playground` in `packages/docs` now do from the same `@ez-gform/core`
+`FB_PUBLIC_LOAD_DATA_` parser (closing #1, #2, #3, #8, and #10 at the
+parser level). The extension-specific gaps (#4–#7, #9, #11, #12) no
+longer apply because there is no extension to ship.
 
 ### `example` / docs app
 
@@ -207,7 +184,7 @@ codebase as it stands today.
    `types` via `workspace:*`, never an external registry pin.
 2. Closed — `/playground` in `packages/docs` covers every supported
    question type plus error/loading states driven by the state machine.
-3. Closed — `/getting-started` and the CLI/extension docs eliminate manual
+3. Closed — `/getting-started` and the CLI docs eliminate manual
    `entry.*` ID hunting.
 4. Closed — `useGoogleForm` takes a plain values object; no wrapper-div/
    named-sub-input convention exists to document.
@@ -219,26 +196,18 @@ codebase as it stands today.
 ### Cross-cutting
 
 - Closed — `@ez-gform/types` is the single source of truth for the form
-  schema type, consumed by `core`, `react`, `codegen`, `cli`, and the
-  extension packages.
+  schema type, consumed by `core`, `react`, `codegen`, `cli`, and `docs`.
 - Closed — single `@ez-gform/*` npm scope throughout; no org-rename debt.
 - Closed — one Turborepo-wide GitHub Actions workflow gates every PR
   across all packages.
 
 ### Genuinely unverified (not exercised by this rebuild)
 
-These three remain open/unverified regardless of what the code claims to
-do, because they require conditions this rebuild didn't (and largely
+This remains open/unverified regardless of what the code claims to
+do, because it requires conditions this rebuild didn't (and largely
 can't, in an automated environment) exercise:
 
-- **Real-browser extension load** — `packages/extension`'s `dist/` has not
-  been loaded unpacked into an actual Chrome instance and clicked through
-  against a live Google Form; only its build/assembly logic is unit
-  tested.
 - **Live network submission** — `packages/core`'s `submit` has not been
   exercised against Google's real `formResponse` endpoint with a live,
   public Google Form; behavior is verified against captured fixtures in
   `packages/core/src/__fixtures__/`, not a live request/response cycle.
-- **Firefox support** — not implemented (see `extension` #7 above), so
-  necessarily unverified; treat the extension as Chrome/Chromium-only
-  until a Firefox manifest variant exists and is tested.
