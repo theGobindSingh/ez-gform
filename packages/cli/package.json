@@ -1,6 +1,6 @@
 {
   "name": "@ez-gform/cli",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "npx tool: fetch a public Google Form and emit JSON schema, TS types, a React component, or a plain HTML form.",
   "type": "module",
   "license": "MIT",

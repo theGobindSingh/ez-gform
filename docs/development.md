@@ -65,5 +65,4 @@ hand:
    scripts), `tsconfig.json` extending `@ez-gform/tsconfig/<kind>.json`,
    `eslint.config.mjs`, and `tsup.config.ts`.
 2. Add the package to the root `tsconfig.json` `references` array.
-3. Add a changeset (`pnpm changeset`).
-4. `pnpm turbo run build test lint type-check --filter=@ez-gform/<name>`.
+3. `pnpm turbo run build test lint type-check --filter=@ez-gform/<name>`.

@@ -4,19 +4,52 @@ on:
   push:
     branches: [main]
 
-concurrency: ${{ github.workflow }}-${{ github.ref }}
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 jobs:
-  release:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Self-test the version bump script
+        run: node .github/scripts/next-version.mjs --self-test
+
+      - name: Lint, type-check, test, build
+        run: pnpm turbo run lint type-check test build
+
+      - name: Format check
+        run: pnpm format:check
+
+  publish:
+    needs: test
+    if: "github.event.head_commit != null && !startsWith(github.event.head_commit.message, 'chore(release):')"
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      pull-requests: write
       id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 0
 
       - name: Setup pnpm
@@ -25,20 +58,64 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      # trusted publishing (OIDC) needs npm >= 11.5.1
+      - name: Update npm
+        run: npm install -g npm@latest && npm --version
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Compute next version
+        env:
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
+        run: |
+          set -euo pipefail
+          CUR=$(node -p "require('./packages/core/package.json').version")
+          NEW=$(node .github/scripts/next-version.mjs "$CUR" "$COMMIT_MSG")
+          echo "NEW=$NEW" >> "$GITHUB_ENV"
+
+      - name: Bump package versions
+        run: |
+          set -euo pipefail
+          for dir in packages/*/; do
+            (cd "$dir" && npm pkg set version="$NEW")
+          done
+          pnpm exec prettier --write "packages/*/package.json"
+
       - name: Build
         run: pnpm turbo run build
 
-      - name: Create Release Pull Request or Publish
-        uses: changesets/action@v1
-        with:
-          publish: pnpm release
-          version: pnpm version-packages
+      - name: Publish packages
+        run: |
+          set -euo pipefail
+          TARBALL_DIR=$(mktemp -d)
+          for p in types core react codegen cli; do
+            if npm view "@ez-gform/$p@$NEW" version >/dev/null 2>&1; then
+              echo "@ez-gform/$p@$NEW already published, skipping"
+              continue
+            fi
+            (cd "packages/$p" && pnpm pack --pack-destination "$TARBALL_DIR")
+            TARBALL=$(find "$TARBALL_DIR" -name "ez-gform-$p-*.tgz" | tail -n1)
+            npm publish "$TARBALL" --access public
+          done
+
+      - name: Commit and tag
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add packages/*/package.json
+          git commit -m "chore(release): v$NEW [skip ci]"
+          git pull --rebase origin main
+          git tag "v$NEW"
+          git push origin main
+          git push origin "v$NEW"
+
+      - name: Create GitHub release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "v$NEW" --generate-notes

@@ -31,8 +31,7 @@ ez-gform/
 ├── pnpm-workspace.yaml
 ├── package.json
 ├── eslint.config.mjs
-├── .prettierrc
-└── .changeset/
+└── .prettierrc
 ```
 
 ## `packages/types` — `@ez-gform/types`
@@ -139,11 +138,12 @@ so the old undocumented wrapper-div/named-sub-input DOM convention
   for lint, **Prettier** for format — each package lints itself since the
   config is type-aware and resolves its tsconfig from the working directory;
   Prettier's config is root-only.
-- **Changesets** for versioning — the legacy repos had npm/GitHub-org
-  naming drift (`@webadeva/...` vs `@hymns-of-web/...`, unpublished
-  versions that existed in git but not on npm); Changesets enforces a
-  single coordinated release flow across all `@ez-gform/*` packages from a
-  consistent scope.
+- **Commit-driven, fixed-version releases** for versioning — the legacy
+  repos had npm/GitHub-org naming drift (`@webadeva/...` vs
+  `@hymns-of-web/...`, unpublished versions that existed in git but not on
+  npm); `.github/workflows/release.yml` publishes every `@ez-gform/*`
+  package at one shared version on every push to `main`, via npm trusted
+  publishing (OIDC, no tokens), from a consistent scope.
 - **GitHub Actions CI** (lint, type-check, test, build) gating every PR —
   none of the three legacy repos had any CI at all; this is the single
   most repeated gap across all three (gap-analysis, every section).

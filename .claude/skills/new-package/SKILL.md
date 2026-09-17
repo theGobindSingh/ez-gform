@@ -13,5 +13,4 @@ description: Scaffold a new @ez-gform/* workspace package with the standard tsup
 6. Add the package to `pnpm-workspace.yaml` globs if it lives somewhere new (default glob already covers `packages/*`).
 7. Add the package to the root `tsconfig.json` `references` array.
 8. Workspace deps use `"@ez-gform/core": "workspace:*"`.
-9. Add a changeset: `pnpm changeset`.
-10. Run `pnpm turbo run build test lint type-check --filter=@ez-gform/<name>` before finishing.
+9. Run `pnpm turbo run build test lint type-check --filter=@ez-gform/<name>` before finishing.

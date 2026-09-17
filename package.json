@@ -14,13 +14,9 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "type-check": "turbo run type-check",
-    "clean": "turbo run clean",
-    "changeset": "changeset",
-    "version-packages": "changeset version",
-    "release": "turbo run build && changeset publish"
+    "clean": "turbo run clean"
   },
   "devDependencies": {
-    "@changesets/cli": "3.0.3",
     "@kami-ui/eslint-config": "0.0.6",
     "eslint": "10.10.0",
     "prettier": "3.9.7",

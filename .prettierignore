@@ -6,3 +6,7 @@ node_modules
 packages/core/src/__fixtures__
 packages/docs/next-env.d.ts
 packages/docs/src/app/playground/all-question-types.fixture.json
+.claude/skills/impeccable
+.github/skills/impeccable
+.claude/agents/impeccable-*
+.github/agents/impeccable-*

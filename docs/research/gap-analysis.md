@@ -127,8 +127,9 @@ package, each with a one-line rebuild fix.
   type, consumed by `react`, `cli`, and `extension` alike._
 - **npm/org naming drift** (`@webadeva/...` vs `@hymns-of-web/...`, GitHub
   org renamed without redirecting release links). _Fix: single consistent
-  `@ez-gform/*` npm scope and GitHub org from day one, enforced by
-  Changesets release config._
+  `@ez-gform/*` npm scope and GitHub org from day one, enforced by the
+  commit-driven release workflow that publishes every package at one
+  shared version._
 - **No CI anywhere in any of the three repos.** _Fix: one Turborepo-wide
   GitHub Actions workflow (lint, typecheck, test, build) gating every PR
   across all packages._

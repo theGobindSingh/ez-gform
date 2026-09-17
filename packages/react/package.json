@@ -1,6 +1,6 @@
 {
   "name": "@ez-gform/react",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "React hooks for submitting to a Google Form without a backend.",
   "type": "module",
   "license": "MIT",
