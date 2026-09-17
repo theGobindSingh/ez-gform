@@ -1,6 +1,6 @@
 {
   "name": "@ez-gform/core",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Framework-agnostic Google Forms parser, entry encoder, and submitter.",
   "type": "module",
   "license": "MIT",
