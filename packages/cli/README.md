@@ -1,38 +1,42 @@
 # @ez-gform/cli
 
-`npx` tool: fetch a public Google Form and emit a JSON schema, TypeScript
-types, a paste-ready React component, or a plain HTML form — the
-scripting/CI path for getting `entry.*` ids and generated code.
-
-## Usage
+Point it at a public Google Form; get the form's `entry.N` ids, or ready-made
+code.
 
 ```sh
-npx @ez-gform/cli <form-url-or-id> [--format json|types|react|html] [--name MyForm] [--out <file>] [--json-input <file>]
+npx @ez-gform/cli <form-url-or-id>
+```
+
+That prints the form's schema as JSON: every question, its type, and its
+entry id.
+
+## Generate code
+
+```sh
+npx @ez-gform/cli <form-url-or-id> --format react --out ContactForm.tsx
+```
+
+| Flag                  | What it does                                                  |
+| --------------------- | ------------------------------------------------------------- |
+| `--format`            | `json` (default), `types`, `react` or `html`.                 |
+| `--name MyForm`       | Name for the generated types / component.                     |
+| `--out <file>`        | Write to a file instead of printing.                          |
+| `--json-input <file>` | Read a saved form page (HTML or JSON) instead of fetching it. |
+
+## Test a submission
+
+```sh
 npx @ez-gform/cli submit <form-url-or-id> --data '{"entry.123":"hi"}'
-npx @ez-gform/cli --help
-npx @ez-gform/cli --version
 ```
 
-- `--format` defaults to `json`.
-- `--name` sets the base name used by the `types`/`react` formats.
-- `--out <file>` writes to a file instead of stdout.
-- `--json-input <file>` reads a saved `FB_PUBLIC_LOAD_DATA_` JSON array or a
-  saved `/viewform` HTML page instead of fetching over the network.
-- `submit --data '<json>'` or `--data @file.json` validates the payload
-  against the fetched schema, then POSTs it with `mode: "cors"` (so the
-  response can actually be read, unlike a browser submission) — useful as a
-  smoke test.
+Checks the data against the form, then submits it. Unlike a browser, the CLI
+can read Google's response, so this tells you whether the submission really
+worked. `--data @file.json` reads from a file.
 
-Exit codes: `0` success, `1` usage error, `2` fetch/parse/validation error.
+## Good to know
 
-If a form requires sign-in, the CLI prints a clear error instead of a
-confusing HTML dump:
-
-> This form requires sign-in; ez-gform only works with forms that are public
-> (Settings → Responses → 'Restrict to users in `<org>`' off)
-
-## Install
-
-```sh
-pnpm add -D @ez-gform/cli
-```
+- The form must be public. If it needs sign-in, the CLI tells you which Google
+  Forms setting to turn off.
+- Exit codes: `0` success, `1` bad usage, `2` fetch, parse or validation
+  error.
+- Use it often? `pnpm add -D @ez-gform/cli`.

@@ -1,17 +1,12 @@
 import { Code } from "@/components/Code";
+import Link from "next/link";
 
 const hookExample = `import { useGoogleForm } from "@ez-gform/react";
-import type { FormSchema } from "@ez-gform/react";
 
-function ContactForm({ schema }: { schema: FormSchema }) {
-  const { register, registerCheckbox, submit, status, errors, isSubmitting } =
+function ContactForm() {
+  const { register, registerCheckbox, submit, status, isSubmitting } =
     useGoogleForm({
-      formId: schema.formId, // bare id, e/<id>, or any docs.google.com/forms URL
-      schema, // enables validation + multi-page field support
-      initialValues: { "entry.111": "" },
-      onSent: (result) => console.log("sent:", result),
-      onError: (result, validationErrors) =>
-        console.error(result, validationErrors),
+      formId: "https://docs.google.com/forms/d/e/1FAIpQLS.../viewform",
     });
 
   return (
@@ -23,10 +18,6 @@ function ContactForm({ schema }: { schema: FormSchema }) {
         Swimming
       </label>
 
-      {errors.map((e) => (
-        <p key={e.entryId}>{e.message}</p>
-      ))}
-
       <button type="submit" disabled={isSubmitting}>
         {isSubmitting ? "Sending…" : "Send"}
       </button>
@@ -36,50 +27,96 @@ function ContactForm({ schema }: { schema: FormSchema }) {
   );
 }`;
 
+const OPTIONS: [string, string][] = [
+  ["formId", "The form's URL or id. Required."],
+  ["schema", "A FormSchema (from the CLI). Turns on validation before submit."],
+  ["validate", "Set false to skip validation even when schema is given."],
+  ["initialValues", "Starting values, keyed by entry id."],
+  ["resetOnSent", "Reset to initialValues after a successful submit."],
+  ["onSent", "Called after a submission is sent."],
+  ["onError", "Called with the result (and validation errors) on failure."],
+  ["mode", `"no-cors" (default) or "cors". See below.`],
+  ["fetch", "Custom fetch, for tests or non-browser runtimes."],
+];
+
+const RETURNS: [string, string][] = [
+  ["register(entryId)", "Props for an input, textarea or select."],
+  ["registerCheckbox(entryId, option)", "Props for one checkbox option."],
+  ["submit", "Pass to onSubmit, or call it yourself. Returns a promise."],
+  ["status", "idle, validating, submitting, sent, ok or error."],
+  ["isSubmitting", "true while a submission is in flight."],
+  ["errors", "Validation errors: { entryId, message }[]."],
+  ["values, setValue, setValues", "Read or set values directly."],
+  ["reset", "Back to initialValues."],
+  ["result", "The last SubmitResult."],
+  ["prefillUrl", "Link to the Google Form prefilled with the current values."],
+];
+
+const Table = ({ head, rows }: { head: string; rows: [string, string][] }) => {
+  return (
+    <table>
+      <thead>
+        <tr>
+          <th>{head}</th>
+          <th>What it does</th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map(([name, text]) => {
+          return (
+            <tr key={name}>
+              <td>
+                <code>{name}</code>
+              </td>
+              <td>{text}</td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  );
+};
+
 export default function ReactPackagePage() {
   return (
     <div>
       <h1>@ez-gform/react</h1>
       <p>
-        React hooks for submitting a custom <code>&lt;form&gt;</code> UI
-        straight to a Google Form, with no backend. Built on{" "}
-        <code>@ez-gform/core</code>.
+        A React hook that submits your own <code>&lt;form&gt;</code> to a Google
+        Form. No backend.
       </p>
 
       <h2>Install</h2>
-      <Code language="sh">
-        {`pnpm add @ez-gform/react @ez-gform/core react`}
-      </Code>
+      <Code language="sh">{`pnpm add @ez-gform/react`}</Code>
 
-      <h2>useGoogleForm</h2>
-      <p>
-        A controlled-values hook with an explicit <code>status</code> state
-        machine (<code>idle</code> → <code>validating</code>? →{" "}
-        <code>submitting</code> → <code>sent</code> / <code>ok</code> /{" "}
-        <code>error</code>) and a promise-returning <code>submit</code>. A
-        second <code>submit()</code> call while one is already in flight reuses
-        the same in-flight promise instead of double-posting.
-      </p>
+      <h2>Usage</h2>
       <Code language="tsx">{hookExample}</Code>
       <p>
-        <code>submit</code> also accepts being passed directly as a form&apos;s{" "}
-        <code>onSubmit</code> (it calls <code>event.preventDefault()</code> for
-        you) or called imperatively — either way it resolves a{" "}
-        <code>SubmitResult</code>. In the browser, submissions use{" "}
-        <code>
-          fetch(url, {"{"} mode: &quot;no-cors&quot; {"}"})
-        </code>
-        , so Google&apos;s response is opaque and <code>status</code> can only
-        ever reach <code>&quot;sent&quot;</code>, never a confirmed{" "}
-        <code>&quot;ok&quot;</code> — pass <code>mode: &quot;cors&quot;</code>{" "}
-        (e.g. from a Node/CLI context) to get a real <code>&quot;ok&quot;</code>
-        /<code>&quot;error&quot;</code> outcome.
+        Need your entry ids? See{" "}
+        <Link href="/guides/finding-your-form">finding your form</Link>. For
+        dates, grids and &quot;Other&quot; options, use <code>setValue</code>{" "}
+        with the shapes in{" "}
+        <Link href="/guides/question-types">question types</Link>.
       </p>
+
+      <h2>Options</h2>
+      <Table head="Option" rows={OPTIONS} />
+
+      <h2>Returns</h2>
+      <Table head="Field" rows={RETURNS} />
       <p>
-        Also returned: <code>values</code>, <code>setValue</code>,{" "}
-        <code>setValues</code>, <code>reset</code>, <code>result</code>,{" "}
-        <code>prefillUrl</code> (a <code>/viewform?usp=pp_url&amp;...</code>{" "}
-        link prefilled with the current values).
+        Calling <code>submit()</code> again while one is in flight does not send
+        twice.
+      </p>
+
+      <h2>&quot;sent&quot; is not &quot;succeeded&quot;</h2>
+      <p>
+        Browsers can&apos;t read Google&apos;s response (the request is{" "}
+        <code>no-cors</code>), so in the browser <code>status</code> stops at{" "}
+        <code>&quot;sent&quot;</code>: the request went out, but you can&apos;t
+        know whether Google accepted it. Outside the browser (Node), pass{" "}
+        <code>mode: &quot;cors&quot;</code> to get a real{" "}
+        <code>&quot;ok&quot;</code> or <code>&quot;error&quot;</code>.
       </p>
     </div>
   );

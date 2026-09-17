@@ -10,12 +10,9 @@ export default function PlaygroundPage() {
     <div>
       <h1>Playground</h1>
       <p>
-        Paste a public Google Form URL or id, or click{" "}
-        <strong>Load example</strong> to try it offline with a bundled fixture
-        covering every question type. The schema is fetched server-side via{" "}
-        <code>GET /api/schema</code> (Node runtime), which runs{" "}
-        <code>@ez-gform/core</code>&apos;s <code>parseFormHtml</code> against
-        the form&apos;s public <code>/viewform</code> HTML.
+        Paste a public Google Form URL to see its questions and entry ids, get
+        generated code, and try a live form. No form handy? Click{" "}
+        <strong>Load example</strong>.
       </p>
       <PlaygroundClient />
     </div>

@@ -1,8 +1,10 @@
 # @ez-gform/codegen
 
-Pure, framework-agnostic code generators that turn a parsed `FormSchema`
-(from `@ez-gform/core`) into paste-ready output. No `fs`, no `process` — runs
-in Node and the browser alike. Only runtime dependency is `@ez-gform/core`.
+Turn a form's schema into code you can paste: TypeScript types, a React
+component, or a plain HTML form. Runs in Node and the browser.
+
+Just want the output? `npx @ez-gform/cli <google-form-url> --format react`
+does this for you, no install needed.
 
 ## Install
 
@@ -10,40 +12,38 @@ in Node and the browser alike. Only runtime dependency is `@ez-gform/core`.
 pnpm add @ez-gform/codegen
 ```
 
-## API
+## Usage
+
+`schema` is a `FormSchema` from `@ez-gform/core`'s `parseFormHtml`.
 
 ```ts
 import {
+  generateHtmlForm,
+  generateReactComponent,
   generateSchemaJson,
   generateTypes,
-  generateReactComponent,
-  generateHtmlForm,
-  toPascalCase,
-  toIdentifier,
 } from "@ez-gform/codegen";
 
-generateSchemaJson(schema, { pretty: true });
-// -> pretty/minified JSON text of the schema.
-
-generateTypes(schema, { name: "MyForm" });
-// -> `export const MyFormSchema = {...} as const satisfies FormSchema;`
-//    plus `export type MyFormValues = { "entry.123"?: string; ... };`
-//    with checkboxes/multiple_choice "Other" options, date/time, grid rows,
-//    and linear-scale numbers all mapped to the right FieldValue subtype.
-
-generateReactComponent(schema, { name: "MyForm", typescript: true });
-// -> a complete .tsx component wired to `useGoogleForm` from `@ez-gform/react`.
-
-generateHtmlForm(schema);
-// -> a plain <form action="…/formResponse" method="POST"> with correct
-//    `entry.N` / `entry.N_year` / `__other_option__` name attributes,
-//    for people not using React.
+generateSchemaJson(schema); // the schema as JSON text
+generateTypes(schema, { name: "MyForm" }); // MyFormSchema const + MyFormValues type
+generateReactComponent(schema, { name: "MyForm" }); // a .tsx component using useGoogleForm
+generateHtmlForm(schema); // a plain <form> that posts to Google, no JS
 ```
 
-## Notes
+Each function returns a string.
 
-- `file_upload` questions are omitted from generated types and rendered as a
-  disabled note in the React/HTML output — Google Forms doesn't accept file
-  uploads through the public API without a signed-in session.
-- Generated output embeds the full schema as a literal so each artifact is
-  self-contained and paste-ready.
+| Function                 | Options                                                             |
+| ------------------------ | ------------------------------------------------------------------- |
+| `generateSchemaJson`     | `pretty` (default `true`)                                           |
+| `generateTypes`          | `name` (default: from the form title)                               |
+| `generateReactComponent` | `name`, `typescript` (default `true`; `false` emits plain JS + JSX) |
+| `generateHtmlForm`       | none                                                                |
+
+Also exported: `toPascalCase`, `toIdentifier` (the naming helpers used above).
+
+## Good to know
+
+- File upload questions can't be submitted without a Google sign-in, so they
+  are left out of the types and shown as a disabled note in React/HTML output.
+- Output is self-contained: the schema is embedded, so you can paste a single
+  file.

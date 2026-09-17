@@ -1,181 +1,107 @@
+import { Code } from "@/components/Code";
+
+const example = `setValue("entry.1", "Jane");                          // short answer
+setValue("entry.2", ["Swimming", "Chess"]);           // checkboxes
+setValue("entry.3", { other: "Kite surfing" });       // "Other" option
+setValue("entry.4", { year: 2026, month: 3, day: 9 }); // date`;
+
+const ROWS: { type: string; value: string; note?: string }[] = [
+  { type: "Short answer", value: `"text"` },
+  { type: "Paragraph", value: `"text"`, note: "Use \\n for line breaks." },
+  { type: "Multiple choice", value: `"Option text"` },
+  { type: "Dropdown", value: `"Option text"` },
+  { type: "Checkboxes", value: `["Option A", "Option B"]` },
+  {
+    type: `"Other" option`,
+    value: `{ other: "my text" }`,
+    note: "Works in multiple choice, and inside a checkboxes array.",
+  },
+  { type: "Linear scale", value: "4" },
+  {
+    type: "Date",
+    value: "{ year, month, day }",
+    note: "year is optional. Add hour and minute if the question asks for a time.",
+  },
+  { type: "Time", value: "{ hour, minute }" },
+  {
+    type: "Multiple choice grid",
+    value: `{ "entry.<rowId>": "Column" }`,
+    note: "One key per row. Each row has its own entry id.",
+  },
+  {
+    type: "Checkbox grid",
+    value: `{ "entry.<rowId>": ["Col A", "Col B"] }`,
+  },
+  {
+    type: "File upload",
+    value: "not supported",
+    note: "Google requires sign-in for uploads.",
+  },
+];
+
 export default function QuestionTypesPage() {
   return (
     <div>
       <h1>Question types</h1>
       <p>
-        Every <code>QuestionType</code> in <code>@ez-gform/types</code>, the
-        shape of the value you hand to <code>useGoogleForm</code> /{" "}
-        <code>encodeValues</code> for it (<code>FieldValue</code>), and the wire
-        format it&apos;s encoded to on submit. Source:{" "}
-        <code>docs/research/google-forms-internals.md</code>.
+        What value to pass for each kind of Google Forms question. The same
+        shapes work in <code>useGoogleForm</code> and in{" "}
+        <code>@ez-gform/core</code>.
       </p>
 
       <table>
         <thead>
           <tr>
-            <th>QuestionType</th>
-            <th>FieldValue shape</th>
-            <th>Encoded entry params</th>
+            <th>Question</th>
+            <th>Value</th>
+            <th>Notes</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>
-              <code>short_answer</code>
-            </td>
-            <td>
-              <code>string</code>
-            </td>
-            <td>
-              <code>entry.NNN=&lt;value&gt;</code>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <code>paragraph</code>
-            </td>
-            <td>
-              <code>string</code>
-            </td>
-            <td>
-              <code>entry.NNN=&lt;value&gt;</code> (<code>\n</code> for line
-              breaks)
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <code>multiple_choice</code>
-            </td>
-            <td>
-              <code>string</code> or <code>{"{ other: string }"}</code> when the
-              question has an &quot;Other&quot; option
-            </td>
-            <td>
-              <code>entry.NNN=&lt;exact option text&gt;</code>, or{" "}
-              <code>entry.NNN=__other_option__</code> +{" "}
-              <code>entry.NNN.other_option_response=&lt;text&gt;</code>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <code>dropdown</code>
-            </td>
-            <td>
-              <code>string</code>
-            </td>
-            <td>
-              <code>entry.NNN=&lt;exact option text&gt;</code>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <code>checkboxes</code>
-            </td>
-            <td>
-              <code>string[]</code> or{" "}
-              <code>{"(string | { other: string })[]"}</code>
-            </td>
-            <td>
-              repeated <code>entry.NNN=OptionA&amp;entry.NNN=OptionB</code>{" "}
-              (plus the <code>__other_option__</code> pair if &quot;Other&quot;
-              is selected)
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <code>linear_scale</code>
-            </td>
-            <td>
-              <code>number</code>
-            </td>
-            <td>
-              <code>entry.NNN=&lt;number as string&gt;</code>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <code>date</code>
-            </td>
-            <td>
-              <code>{"DateValue"}</code>:{" "}
-              <code>{"{ year?, month, day, hour?, minute? }"}</code>
-            </td>
-            <td>
-              <code>entry.NNN_year</code> (omitted if <code>year</code> is
-              undefined) / <code>_month</code> / <code>_day</code> (+{" "}
-              <code>_hour</code> / <code>_minute</code> if the question includes
-              a time)
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <code>time</code>
-            </td>
-            <td>
-              <code>{"TimeValue"}</code>: <code>{"{ hour, minute }"}</code>
-            </td>
-            <td>
-              <code>entry.NNN_hour</code> / <code>entry.NNN_minute</code>,
-              zero-padded to 2 digits
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <code>grid</code> (multiple choice grid)
-            </td>
-            <td>
-              <code>{"Record<rowEntryId, string>"}</code>
-            </td>
-            <td>
-              each row has its own <code>entry.&lt;rowId&gt;</code>, value is
-              the selected column&apos;s exact text
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <code>checkbox_grid</code> (tick-box grid)
-            </td>
-            <td>
-              <code>{"Record<rowEntryId, string[]>"}</code>
-            </td>
-            <td>
-              each row has its own <code>entry.&lt;rowId&gt;</code>, repeated
-              per selected column
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <code>file_upload</code>
-            </td>
-            <td>
-              unsupported — <code>null</code>/<code>undefined</code> (skipped)
-            </td>
-            <td>
-              not submittable through the public <code>formResponse</code>{" "}
-              endpoint; omitted from generated types/UI
-            </td>
-          </tr>
+          {ROWS.map((row) => {
+            return (
+              <tr key={row.type}>
+                <td>{row.type}</td>
+                <td>
+                  <code>{row.value}</code>
+                </td>
+                <td>{row.note}</td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
 
-      <h2>Notes</h2>
+      <Code language="ts">{example}</Code>
+
+      <h2>Watch out for</h2>
       <ul>
         <li>
-          <code>null</code>/<code>undefined</code> values are always skipped by{" "}
-          <code>encodeValues</code> — it never throws and never hand-encodes
-          strings, it builds a native <code>URLSearchParams</code>.
+          Option text must match the form <strong>exactly</strong>, including
+          case and spaces. Google silently drops answers that don&apos;t match.
         </li>
         <li>
-          Multiple choice / dropdown / grid values must match the option text{" "}
-          <strong>exactly</strong> (case, whitespace) or Google silently ignores
-          the answer.
+          Empty strings, <code>null</code> and <code>undefined</code> are
+          skipped, not sent as blank answers.
         </li>
         <li>
-          Pair any of the above with <code>validateValues(values, schema)</code>{" "}
-          to check for unknown entry ids or missing required answers before
-          submitting.
+          Pass a <code>schema</code> to <code>useGoogleForm</code> (or call{" "}
+          <code>validateValues</code>) to catch wrong entry ids and missing
+          required answers before submitting.
         </li>
       </ul>
+
+      <h2>Writing plain HTML by hand?</h2>
+      <p>
+        Most inputs just use <code>name=&quot;entry.N&quot;</code>, but a few
+        types split into several fields: dates are <code>entry.N_year</code>,{" "}
+        <code>entry.N_month</code>, <code>entry.N_day</code>; times are{" "}
+        <code>entry.N_hour</code>, <code>entry.N_minute</code>;
+        &quot;Other&quot; sends <code>entry.N=__other_option__</code> plus{" "}
+        <code>entry.N.other_option_response</code>. It&apos;s easier to let{" "}
+        <a href="/packages/cli">the CLI</a> generate the form with{" "}
+        <code>--format html</code>.
+      </p>
     </div>
   );
 }

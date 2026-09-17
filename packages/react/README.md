@@ -1,34 +1,22 @@
 # @ez-gform/react
 
-React hooks for submitting a custom `<form>` UI straight to a Google Form,
-with no backend. Built on `@ez-gform/core`.
+A React hook that submits your own `<form>` to a Google Form. No backend.
 
 ## Install
 
 ```sh
-pnpm add @ez-gform/react @ez-gform/core react
+pnpm add @ez-gform/react
 ```
 
-## `useGoogleForm`
-
-A controlled-values hook with an explicit `status` state machine
-(`idle` → `validating`? → `submitting` → `sent` / `ok` / `error`) and a
-promise-returning `submit`. A second `submit()` call while one is already
-in flight reuses the same in-flight promise instead of double-posting.
+## Usage
 
 ```tsx
 import { useGoogleForm } from "@ez-gform/react";
-import type { FormSchema } from "@ez-gform/react";
 
-function ContactForm({ schema }: { schema: FormSchema }) {
-  const { register, registerCheckbox, submit, status, errors, isSubmitting } =
+function ContactForm() {
+  const { register, registerCheckbox, submit, status, isSubmitting } =
     useGoogleForm({
-      formId: schema.formId, // bare id, e/<id>, or any docs.google.com/forms URL
-      schema, // enables validation + multi-page field support
-      initialValues: { "entry.111": "" },
-      onSent: (result) => console.log("sent:", result),
-      onError: (result, validationErrors) =>
-        console.error(result, validationErrors),
+      formId: "https://docs.google.com/forms/d/e/1FAIpQLS.../viewform",
     });
 
   return (
@@ -40,30 +28,52 @@ function ContactForm({ schema }: { schema: FormSchema }) {
         Swimming
       </label>
 
-      {errors.map((e) => (
-        <p key={e.entryId}>{e.message}</p>
-      ))}
-
       <button type="submit" disabled={isSubmitting}>
         {isSubmitting ? "Sending…" : "Send"}
       </button>
-      {status === "sent" && (
-        <p>Thanks! (browser submissions are fire-and-forget — see below)</p>
-      )}
+      {status === "sent" && <p>Thanks!</p>}
       {status === "error" && <p>Something went wrong.</p>}
     </form>
   );
 }
 ```
 
-`submit` also accepts being passed directly as a form's `onSubmit` (it calls
-`event.preventDefault()` for you) or called imperatively — either way it
-resolves a `SubmitResult`. In the browser, submissions use
-`fetch(url, { mode: "no-cors" })`, so Google's response is opaque and
-`status` can only ever reach `"sent"`, never a confirmed `"ok"` — pass
-`mode: "cors"` (e.g. from a Node/CLI context) to get a real `"ok"`/`"error"`
-outcome.
+Find your form's `entry.N` ids with `npx @ez-gform/cli <google-form-url>`.
 
-Also returned: `values`, `setValue`, `setValues`, `reset`, `result`,
-`prefillUrl` (a `/viewform?usp=pp_url&...` link prefilled with the current
-values).
+## Options
+
+| Option          | What it does                                                         |
+| --------------- | -------------------------------------------------------------------- |
+| `formId`        | The form's URL or id. Required.                                      |
+| `schema`        | A `FormSchema` (from the CLI). Turns on validation before submit.    |
+| `validate`      | Set `false` to skip validation even when `schema` is given.          |
+| `initialValues` | Starting values, keyed by `entry.N`.                                 |
+| `resetOnSent`   | Reset to `initialValues` after a successful submit. Default `false`. |
+| `onSent`        | Called after a submission is sent.                                   |
+| `onError`       | Called with the result (and validation errors) when something fails. |
+| `mode`          | `"no-cors"` (default) or `"cors"`. See below.                        |
+| `fetch`         | Custom `fetch`, for tests or non-browser runtimes.                   |
+
+## Returns
+
+| Field                               | What it is                                                  |
+| ----------------------------------- | ----------------------------------------------------------- |
+| `register(entryId)`                 | Props for an input, textarea or select.                     |
+| `registerCheckbox(entryId, option)` | Props for one checkbox option.                              |
+| `submit`                            | Pass to `onSubmit`, or call it yourself. Returns a promise. |
+| `status`                            | `idle`, `validating`, `submitting`, `sent`, `ok`, `error`.  |
+| `isSubmitting`                      | `true` while a submission is in flight.                     |
+| `errors`                            | Validation errors: `{ entryId, message }[]`.                |
+| `values`, `setValue`, `setValues`   | Read or set values directly.                                |
+| `reset`                             | Back to `initialValues`.                                    |
+| `result`                            | The last `SubmitResult`.                                    |
+| `prefillUrl`                        | Link to the Google Form prefilled with the current values.  |
+
+Calling `submit()` again while one is in flight does not send twice.
+
+## "sent" is not "succeeded"
+
+Browsers can't read Google's response (the request is `no-cors`), so in the
+browser `status` stops at `"sent"`: the request went out, but you can't know
+whether Google accepted it. Outside the browser (Node), pass `mode: "cors"`
+to get a real `"ok"` or `"error"`.

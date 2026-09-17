@@ -1,65 +1,94 @@
 import { Code } from "@/components/Code";
+import Link from "next/link";
 
 const api = `import {
+  generateHtmlForm,
+  generateReactComponent,
   generateSchemaJson,
   generateTypes,
-  generateReactComponent,
-  generateHtmlForm,
-  toPascalCase,
-  toIdentifier,
 } from "@ez-gform/codegen";
 
-generateSchemaJson(schema, { pretty: true });
-// -> pretty/minified JSON text of the schema.
-
-generateTypes(schema, { name: "MyForm" });
-// -> \`export const MyFormSchema = {...} as const satisfies FormSchema;\`
-//    plus \`export type MyFormValues = { "entry.123"?: string; ... };\`
-//    with checkboxes/multiple_choice "Other" options, date/time, grid rows,
-//    and linear-scale numbers all mapped to the right FieldValue subtype.
-
-generateReactComponent(schema, { name: "MyForm", typescript: true });
-// -> a complete .tsx component wired to \`useGoogleForm\` from \`@ez-gform/react\`.
-
-generateHtmlForm(schema);
-// -> a plain <form action="…/formResponse" method="POST"> with correct
-//    entry.N / entry.N_year / __other_option__ name attributes,
-//    for people not using React.`;
+generateSchemaJson(schema); // the schema as JSON text
+generateTypes(schema, { name: "MyForm" }); // MyFormSchema const + MyFormValues type
+generateReactComponent(schema, { name: "MyForm" }); // a .tsx component using useGoogleForm
+generateHtmlForm(schema); // a plain <form> that posts to Google, no JS`;
 
 export default function CodegenPackagePage() {
   return (
     <div>
       <h1>@ez-gform/codegen</h1>
       <p>
-        Pure, framework-agnostic code generators that turn a parsed{" "}
-        <code>FormSchema</code> (from <code>@ez-gform/core</code>) into
-        paste-ready output. No <code>fs</code>, no <code>process</code> — runs
-        in Node and the browser alike. Only runtime dependency is{" "}
-        <code>@ez-gform/core</code>.
+        Turn a form&apos;s schema into code you can paste: TypeScript types, a
+        React component, or a plain HTML form. Runs in Node and the browser.
+      </p>
+      <p>
+        Just want the output? The <Link href="/playground">playground</Link> and
+        the <Link href="/packages/cli">CLI</Link> run these generators for you.
       </p>
 
       <h2>Install</h2>
       <Code language="sh">{`pnpm add @ez-gform/codegen`}</Code>
 
-      <h2>API</h2>
+      <h2>Usage</h2>
+      <p>
+        <code>schema</code> is a <code>FormSchema</code> from{" "}
+        <code>@ez-gform/core</code>&apos;s <code>parseFormHtml</code>. Each
+        function returns a string.
+      </p>
       <Code language="ts">{api}</Code>
 
-      <p>
-        Try all four generators live against any public form in the{" "}
-        <a href="/playground">playground</a>.
-      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Function</th>
+            <th>Options</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <code>generateSchemaJson</code>
+            </td>
+            <td>
+              <code>pretty</code> (default <code>true</code>)
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <code>generateTypes</code>
+            </td>
+            <td>
+              <code>name</code> (default: from the form title)
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <code>generateReactComponent</code>
+            </td>
+            <td>
+              <code>name</code>, <code>typescript</code> (default{" "}
+              <code>true</code>; <code>false</code> emits plain JS + JSX)
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <code>generateHtmlForm</code>
+            </td>
+            <td>none</td>
+          </tr>
+        </tbody>
+      </table>
 
-      <h2>Notes</h2>
+      <h2>Good to know</h2>
       <ul>
         <li>
-          <code>file_upload</code> questions are omitted from generated types
-          and rendered as a disabled note in the React/HTML output — Google
-          Forms doesn&apos;t accept file uploads through the public API without
-          a signed-in session.
+          File upload questions can&apos;t be submitted without a Google
+          sign-in, so they are left out of the types and shown as a disabled
+          note in React/HTML output.
         </li>
         <li>
-          Generated output embeds the full schema as a literal so each artifact
-          is self-contained and paste-ready.
+          Output is self-contained: the schema is embedded, so you can paste a
+          single file.
         </li>
       </ul>
     </div>

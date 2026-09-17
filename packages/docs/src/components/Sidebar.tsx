@@ -77,7 +77,7 @@ export const Sidebar = () => {
       })}
       <a
         className="sidebar-external"
-        href="https://github.com/webadeva/ez-gform"
+        href="https://github.com/theGobindSingh/ez-gform"
         target="_blank"
         rel="noreferrer"
       >

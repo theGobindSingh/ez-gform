@@ -1,7 +1,9 @@
 # @ez-gform/core
 
-Framework-agnostic Google Forms parser, entry encoder, and submitter. Zero
-runtime dependencies; works in Node 20+ and browsers (no DOM access).
+Read a Google Form's questions and submit answers to it, from any JavaScript.
+No dependencies. Works in Node 20+ and browsers.
+
+Using React? You want [`@ez-gform/react`](../react) instead.
 
 ## Install
 
@@ -9,51 +11,60 @@ runtime dependencies; works in Node 20+ and browsers (no DOM access).
 pnpm add @ez-gform/core
 ```
 
-## The three main functions
+## Usage
 
 ```ts
-import { parseFormHtml, encodeValues, submitForm } from "@ez-gform/core";
+import { parseFormHtml, submitForm } from "@ez-gform/core";
 
-// 1. Parse a public /viewform page's HTML into a typed FormSchema.
+// 1. Turn a public form's /viewform HTML into a typed schema.
 const schema = parseFormHtml(html);
 
-// 2. Encode plain-object answers into entry.NNN-keyed URLSearchParams,
-//    per Google's per-question-type wire format.
-const params = encodeValues({ "entry.123": "hello" }, schema);
-
-// 3. POST the encoded answers to the form's formResponse endpoint.
+// 2. Submit answers, keyed by entry id.
 const result = await submitForm(
   schema.formId,
   { "entry.123": "hello" },
   { schema },
 );
-// result: { status: "sent" } (browser, no-cors — success is never observable)
-//      or { status: "ok", httpStatus } / { status: "error", error } (Node, mode: "cors")
 ```
 
-Also exported: `extractPublicLoadData`, `parseFormData`, `normalizeFormId`,
-`formUrls`, `buildPrefillUrl`, `buildSubmitBody`, `validateValues`,
-`ParseError`, `ValidationError`, `VERSION`.
+`result.status` is:
 
-## Encoding table
+- `"sent"` by default. The request is `no-cors` (browsers require it), so you
+  can't know whether Google accepted it.
+- `"ok"` or `"error"` if you pass `mode: "cors"`. Only works outside the
+  browser (Node), where the response is readable.
 
-| Value shape                              | Wire format                                                                                                                  |
-| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `string` / `number`                      | `entry.N=<value>` (empty string is skipped)                                                                                  |
-| `string[]`                               | repeated `entry.N=<value>` (checkboxes)                                                                                      |
-| `{ other: string }`                      | `entry.N=__other_option__` + `entry.N.other_option_response=<text>`                                                          |
-| `(string \| { other })[]`                | mix of the two rules above, same `entry.N`                                                                                   |
-| `{ year?, month, day, hour?, minute? }`  | `entry.N_year` (omitted if `year` undefined) `/_month/_day` (unpadded) + `_hour/_minute` if present, zero-padded to 2 digits |
-| `{ hour, minute }`                       | `entry.N_hour` / `entry.N_minute`, zero-padded to 2 digits                                                                   |
-| `Record<rowEntryId, string \| string[]>` | each row's own `entry.<rowId>` (grid questions)                                                                              |
-| `null` / `undefined`                     | skipped                                                                                                                      |
+## Value shapes
 
-`encodeValues` never throws and never hand-encodes strings — it builds a
-native `URLSearchParams`. Pair it with `validateValues(values, schema)` to
-check for unknown entry ids or missing required answers before submitting.
+What to pass for each kind of question:
 
-For a grid question, `FormValues` accepts either a nested row map keyed by
-the parent question's `entry.N` (e.g. `{ "entry.1": { "entry.10": "Agree" } }`)
-or the row `entry.<rowId>` ids passed flat at the top level (e.g.
-`{ "entry.10": "Agree" }`) — both encode to the identical `entry.<rowId>=...`
-`URLSearchParams` output.
+| Question                  | Value                                            |
+| ------------------------- | ------------------------------------------------ |
+| Short answer, paragraph   | `"text"`                                         |
+| Multiple choice, dropdown | `"Option text"` (must match exactly)             |
+| Checkboxes                | `["Option A", "Option B"]`                       |
+| "Other" option            | `{ other: "my text" }`                           |
+| Linear scale              | `4`                                              |
+| Date                      | `{ year, month, day }` (`year` is optional)      |
+| Date with time            | `{ year, month, day, hour, minute }`             |
+| Time                      | `{ hour, minute }`                               |
+| Grid                      | `{ "entry.<rowId>": "Column" }`, one key per row |
+| Checkbox grid             | `{ "entry.<rowId>": ["Col A", "Col B"] }`        |
+
+Empty strings, `null` and `undefined` are skipped.
+
+Each grid row has its own entry id. Pass rows nested under the grid question's
+id (`{ "entry.1": { "entry.10": "Agree" } }`) or flat
+(`{ "entry.10": "Agree" }`); both work.
+
+## Other exports
+
+| Export                                   | What it does                                          |
+| ---------------------------------------- | ----------------------------------------------------- |
+| `validateValues(values, schema)`         | Finds unknown entry ids and missing required answers. |
+| `encodeValues(values, schema)`           | Answers → `URLSearchParams`, without submitting.      |
+| `buildSubmitBody`                        | The exact POST body `submitForm` sends.               |
+| `buildPrefillUrl`                        | A link to the form prefilled with your values.        |
+| `normalizeFormId`, `formUrls`            | Accept any form URL or id; get its endpoints.         |
+| `parseFormData`, `extractPublicLoadData` | Lower-level parsing steps behind `parseFormHtml`.     |
+| `ParseError`, `ValidationError`          | Error classes.                                        |

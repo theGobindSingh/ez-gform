@@ -1,14 +1,15 @@
 import { Code } from "@/components/Code";
 import Link from "next/link";
 
-const installCmd = `pnpm add @ez-gform/react @ez-gform/core react`;
+const cliCmd = `npx @ez-gform/cli "https://docs.google.com/forms/d/e/1FAIpQLS.../viewform"`;
+
+const installCmd = `pnpm add @ez-gform/react`;
 
 const minimalReact = `import { useGoogleForm } from "@ez-gform/react";
 
 function ContactForm() {
   const { register, submit, status, isSubmitting } = useGoogleForm({
-    // The long id from https://docs.google.com/forms/d/e/<FORM_ID>/viewform
-    formId: "1FAIpQLS...",
+    formId: "https://docs.google.com/forms/d/e/1FAIpQLS.../viewform",
   });
 
   return (
@@ -22,8 +23,7 @@ function ContactForm() {
   );
 }`;
 
-const htmlExample = `<!-- Output of @ez-gform/codegen's generateHtmlForm(schema) -->
-<form action="https://docs.google.com/forms/d/e/1FAIpQLS.../formResponse" method="POST">
+const htmlExample = `<form action="https://docs.google.com/forms/d/e/1FAIpQLS.../formResponse" method="POST">
   <label>Your name
     <input type="text" name="entry.111">
   </label>
@@ -34,78 +34,64 @@ export default function GettingStartedPage() {
   return (
     <div>
       <h1>Getting started</h1>
+      <p>Three steps, about five minutes.</p>
+
+      <h2>1. Make your form public</h2>
       <p>
-        ez-gform lets you submit a custom form UI directly to a Google Form,
-        without running a backend of your own. Google Forms is the response
-        store; you own the UI.
+        Your Google Form must accept answers without sign-in. See{" "}
+        <Link href="/guides/finding-your-form">finding your form</Link> for the
+        setting and for where to copy the form&apos;s URL.
       </p>
 
-      <h2>Install</h2>
+      <h2>2. Get your field ids</h2>
+      <p>
+        Every question has an id like <code>entry.111</code>. List them all:
+      </p>
+      <Code language="sh" filename="terminal">
+        {cliCmd}
+      </Code>
+      <p>
+        Or paste the URL into the <Link href="/playground">playground</Link>.
+      </p>
+
+      <h2>3. Build the form</h2>
       <Code language="sh" filename="terminal">
         {installCmd}
       </Code>
-      <p>
-        <code>@ez-gform/react</code> depends on <code>@ez-gform/core</code> (the
-        framework-agnostic parser/encoder/ submit client) — installing both gets
-        you the hook plus the underlying primitives.
-      </p>
-
-      <h2>Minimal React example</h2>
-      <p>
-        You need two things: a public form&apos;s id (see{" "}
-        <Link href="/guides/finding-your-form">finding your form</Link>) and the{" "}
-        <code>entry.NNN</code> id for each field you want to fill in (found the
-        same way, or generated for you by the{" "}
-        <Link href="/playground">playground</Link> or{" "}
-        <Link href="/packages/cli">CLI</Link>).
-      </p>
       <Code language="tsx" filename="ContactForm.tsx">
         {minimalReact}
       </Code>
       <p>
-        <code>submit</code> can be passed straight to <code>onSubmit</code> (it
-        calls <code>preventDefault()</code> for you) and resolves a{" "}
-        <code>SubmitResult</code>. In the browser, submissions use{" "}
-        <code>
-          fetch(url, {"{"} mode: &quot;no-cors&quot; {"}"})
-        </code>
-        , so Google&apos;s response is opaque — <code>status</code> reaches{" "}
-        <code>&quot;sent&quot;</code>, never a confirmed{" "}
-        <code>&quot;ok&quot;</code>, from a browser.
+        Swap in your form&apos;s URL and entry ids, and you&apos;re done.{" "}
+        <code>status</code> becomes <code>&quot;sent&quot;</code> once the
+        request goes out. Browsers can&apos;t read Google&apos;s reply, so there
+        is no confirmed &quot;ok&quot;.
       </p>
 
-      <h2>Plain HTML example</h2>
+      <h2>Not using React?</h2>
       <p>
-        Not using React? <code>@ez-gform/codegen</code>&apos;s{" "}
-        <code>generateHtmlForm(schema)</code> emits a plain{" "}
-        <code>&lt;form&gt;</code> with the correct <code>entry.NNN</code>{" "}
-        <code>name</code> attributes, ready to submit with no JavaScript at all
-        (the browser&apos;s native form POST handles the cross-origin request):
+        A plain HTML form works with no JavaScript at all. Use each
+        question&apos;s entry id as the input <code>name</code>:
       </p>
       <Code language="html" filename="form.html">
         {htmlExample}
       </Code>
       <p>
-        Generate this for any public form in the{" "}
-        <Link href="/playground">playground</Link>&apos;s &quot;html&quot; tab,
-        or via <code>npx @ez-gform/cli &lt;form-url&gt; --format html</code>.
+        Generate the whole thing with{" "}
+        <code>npx @ez-gform/cli &lt;form-url&gt; --format html</code>, or from
+        the playground&apos;s &quot;html&quot; tab.
       </p>
 
       <h2>Next steps</h2>
       <ul>
         <li>
-          <Link href="/guides/finding-your-form">
-            How to get a form&apos;s URL/ID and make it public
-          </Link>
-        </li>
-        <li>
           <Link href="/guides/question-types">
-            Every question type and how it&apos;s encoded on submit
+            Checkboxes, dates, grids: what value each question type takes
           </Link>
         </li>
         <li>
           <Link href="/packages/react">
-            Full <code>useGoogleForm</code> API reference
+            Everything <code>useGoogleForm</code> can do
           </Link>
         </li>
       </ul>
