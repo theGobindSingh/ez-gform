@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ParseError, ValidationError } from "./errors.js";
+import { ParseError, ValidationError } from "../errors.js";
 
 describe("ParseError", () => {
   it("is an Error subclass with the right name/message", () => {

@@ -1,7 +1,10 @@
 import type { FormSchema, Question } from "@ez-gform/types";
 import { describe, expect, it } from "vitest";
-import { FIXTURE_SLUGS, loadFixtureSchema } from "./__test-utils__/fixtures.js";
-import { generateHtmlForm } from "./generate-html.js";
+import {
+  FIXTURE_SLUGS,
+  loadFixtureSchema,
+} from "../__test-utils__/fixtures.js";
+import { generateHtmlForm } from "../generate-html.js";
 
 const hasOtherOption = (question: Question): boolean => {
   return (
@@ -89,7 +92,7 @@ describe("generateHtmlForm", () => {
   }
 
   it("posts to the formResponse URL", () => {
-    const schema = loadFixtureSchema("event-feedback");
+    const schema = loadFixtureSchema("all-question-types");
     const html = generateHtmlForm(schema);
     expect(html).toContain(
       `action="https://docs.google.com/forms/d/e/${schema.formId}/formResponse"`,

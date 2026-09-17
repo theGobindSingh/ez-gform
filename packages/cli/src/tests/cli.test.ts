@@ -7,9 +7,9 @@ import { describe, expect, it } from "vitest";
 
 const execFileAsync = promisify(execFile);
 
-const cliPath = fileURLToPath(new URL("../dist/cli.js", import.meta.url));
+const cliPath = fileURLToPath(new URL("../../dist/cli.js", import.meta.url));
 const fixturesDir = fileURLToPath(
-  new URL("../../core/src/__fixtures__/", import.meta.url),
+  new URL("../../../core/src/__fixtures__/", import.meta.url),
 );
 
 const fixturePath = (slug: string): string => {
@@ -32,14 +32,7 @@ const run = async (
   }
 };
 
-const FIXTURE_SLUGS = [
-  "event-feedback",
-  "event-rsvp",
-  "question-types-demo",
-  "ttrpg-applications",
-  "booking-request",
-  "meeting-room-reservation",
-] as const;
+const FIXTURE_SLUGS = ["all-question-types", "file-upload"] as const;
 
 describe("ez-gform CLI", () => {
   it("prints help", async () => {
@@ -65,7 +58,7 @@ describe("ez-gform CLI", () => {
     const { code, stderr } = await run([
       "some-form-id-1234567890",
       "--json-input",
-      fixturePath("event-feedback"),
+      fixturePath("all-question-types"),
       "--format",
       "yaml",
     ]);
@@ -130,7 +123,7 @@ describe("ez-gform CLI", () => {
     const { stdout, code } = await run([
       "some-form-id-1234567890",
       "--json-input",
-      fixturePath("event-feedback"),
+      fixturePath("all-question-types"),
       "--format",
       "types",
       "--name",
@@ -145,7 +138,7 @@ describe("ez-gform CLI", () => {
       "submit",
       "some-form-id-1234567890",
       "--json-input",
-      fixturePath("event-feedback"),
+      fixturePath("all-question-types"),
       "--data",
       "{}",
     ]);
@@ -158,7 +151,7 @@ describe("ez-gform CLI", () => {
       "submit",
       "some-form-id-1234567890",
       "--json-input",
-      fixturePath("event-feedback"),
+      fixturePath("all-question-types"),
     ]);
     expect(code).toBe(1);
     expect(stderr).toContain("Usage");

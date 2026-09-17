@@ -5,14 +5,14 @@ import userEvent from "@testing-library/user-event";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it, vi } from "vitest";
-import { useGoogleForm } from "./useGoogleForm.js";
+import { useGoogleForm } from "../useGoogleForm.js";
 
 const FORM_ID = "1FAIpQLtestformidtestformid1234567";
 
 const loadDemoSchema = (): FormSchema => {
   const fixturePath = path.resolve(
     import.meta.dirname,
-    "../../core/src/__fixtures__/question-types-demo.json",
+    "../../../core/src/__fixtures__/all-question-types.json",
   );
   const data = JSON.parse(readFileSync(fixturePath, "utf8"));
   return parseFormData(data);

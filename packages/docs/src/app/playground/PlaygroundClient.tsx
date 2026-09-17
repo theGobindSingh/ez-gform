@@ -11,7 +11,7 @@ import {
 import { parseFormData } from "@ez-gform/core";
 import type { FormSchema } from "@ez-gform/types";
 import { useMemo, useState } from "react";
-import questionTypesDemo from "./question-types-demo.fixture.json";
+import allQuestionTypes from "./all-question-types.fixture.json";
 
 type Tab = "json" | "types" | "react" | "html";
 
@@ -64,7 +64,7 @@ export const PlaygroundClient = () => {
       // The fixture is the raw FB_PUBLIC_LOAD_DATA_ JSON captured from a
       // live form; parseFormData turns it into a typed FormSchema, entirely
       // client-side, so the playground works with no network access.
-      const parsed = parseFormData(questionTypesDemo);
+      const parsed = parseFormData(allQuestionTypes);
       setSchema(parsed);
       setInput(parsed.formId);
     } catch (cause) {

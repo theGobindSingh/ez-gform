@@ -140,8 +140,8 @@ codebase as it stands today.
 
 ### `core`
 
-1. Closed — `packages/core` has a real Vitest suite (`*.test.ts` colocated
-   with source).
+1. Closed — `packages/core` has a real Vitest suite (`*.test.ts` in
+   `src/tests/`).
 2. Closed — `useGoogleForm` (`packages/react`) exposes
    `status: 'idle'|'submitting'|'sent'|'ok'|'error'` and `submit` returns a
    promise.

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { toIdentifier, toPascalCase } from "./names.js";
+import { toIdentifier, toPascalCase } from "../names.js";
 
 describe("toPascalCase", () => {
   it("converts a title with spaces to PascalCase", () => {

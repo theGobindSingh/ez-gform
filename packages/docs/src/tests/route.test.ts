@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { GET } from "./route";
+import { GET } from "../app/api/schema/route";
 
 const request = (query: string): Request => {
   return new Request(`http://localhost/api/schema${query}`);
@@ -41,7 +41,7 @@ describe("GET /api/schema — input validation", () => {
 
     const bareId = await GET(
       request(
-        "?formId=1FAIpQLSeea5PBMuJUpTG9ephwFbt4NApN1TPQi6Yc5cNNw0vgPm9Umw",
+        "?formId=1FAIpQLScXpdCnyzcv0h5_3giJaB9vP_00UIXggzt4UAfMamwPApnINw",
       ),
     );
     expect(bareId.status).not.toBe(400);
@@ -50,7 +50,7 @@ describe("GET /api/schema — input validation", () => {
       request(
         "?formId=" +
           encodeURIComponent(
-            "https://docs.google.com/forms/d/e/1FAIpQLSeea5PBMuJUpTG9ephwFbt4NApN1TPQi6Yc5cNNw0vgPm9Umw/viewform",
+            "https://docs.google.com/forms/d/e/1FAIpQLScXpdCnyzcv0h5_3giJaB9vP_00UIXggzt4UAfMamwPApnINw/viewform",
           ),
       ),
     );

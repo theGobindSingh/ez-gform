@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { formUrls, normalizeFormId } from "./url.js";
+import { formUrls, normalizeFormId } from "../url.js";
 
-const ID = "1FAIpQLSciCcNILfeSdgUavm_GYuCFE_G8InD1YVkIWAiTU_B3-l9AkA";
+const ID = "1FAIpQLScXpdCnyzcv0h5_3giJaB9vP_00UIXggzt4UAfMamwPApnINw";
 
 describe("normalizeFormId", () => {
   it("accepts a bare id", () => {

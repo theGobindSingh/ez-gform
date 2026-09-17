@@ -2,10 +2,10 @@ import type { FormSchema, FormValues } from "@ez-gform/types";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { encodeValues, validateValues } from "./encode.js";
-import { parseFormData } from "./parse.js";
+import { encodeValues, validateValues } from "../encode.js";
+import { parseFormData } from "../parse.js";
 
-const fixturesDir = fileURLToPath(new URL("./__fixtures__/", import.meta.url));
+const fixturesDir = fileURLToPath(new URL("../__fixtures__/", import.meta.url));
 
 const loadFixture = (slug: string): unknown => {
   return JSON.parse(readFileSync(`${fixturesDir}${slug}.json`, "utf8"));
@@ -151,9 +151,9 @@ describe("encodeValues — grid row maps", () => {
   });
 
   it("encodes a live grid fixture identically via nested row map or flat row ids", () => {
-    const schema = parseFormData(loadFixture("event-feedback"));
+    const schema = parseFormData(loadFixture("all-question-types"));
     const grid = schema.questions.find((q) => {
-      return q.title === "How satisfied were you with the following:";
+      return q.title === "Radio grid";
     });
     const rows = grid?.rows ?? [];
     expect(rows.length).toBeGreaterThan(1);

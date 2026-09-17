@@ -23,6 +23,6 @@ Invoke the `gform-internals` skill before touching encoding, parsing, or submit 
 
 - TypeScript strict with `noUncheckedIndexedAccess` and `verbatimModuleSyntax` (from `@ez-gform/tsconfig`); use `import type`.
 - Libraries build with tsup to ESM + CJS + d.ts; `@ez-gform/core` must stay zero-runtime-dependency and browser/Node neutral (no DOM access outside `packages/react`).
-- Tests are Vitest, colocated as `*.test.ts` next to the source.
+- Tests are Vitest, `*.test.ts(x)` in each package's `src/tests/` folder (not colocated with the source).
 - Commits: Conventional Commits, single author, no `Co-Authored-By` trailers.
 - Use the `new-package` skill to add a workspace package so it matches the existing layout.

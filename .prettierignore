@@ -5,4 +5,4 @@ pnpm-lock.yaml
 node_modules
 packages/core/src/__fixtures__
 packages/docs/next-env.d.ts
-packages/docs/src/app/playground/question-types-demo.fixture.json
+packages/docs/src/app/playground/all-question-types.fixture.json

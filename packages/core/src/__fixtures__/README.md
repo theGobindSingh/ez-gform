@@ -1,76 +1,74 @@
 # FB_PUBLIC_LOAD_DATA_ fixtures
 
-Captured 2026-09-16 via plain `curl -sL -A "Mozilla/5.0" <url>` (no sign-in,
-no submission). Each `<slug>.html` is the raw viewform page; each
-`<slug>.json` is `FB_PUBLIC_LOAD_DATA_` pretty-printed with
-`JSON.parse`.
+Live captures of two purpose-built forms owned by this project. All content
+is synthetic: no third-party names, emails, or links. Neither form was ever
+submitted to. Captured 2026-09-17.
 
-## event-feedback.html / .json
-https://docs.google.com/forms/d/e/1FAIpQLSeea5PBMuJUpTG9ephwFbt4NApN1TPQi6Yc5cNNw0vgPm9Umw/viewform
-("Event feedback", Infinite Flight LLC)
+To add coverage, edit the form (or build a new one you own) and recapture.
+Do not commit captures of other people's forms.
 
-Types present: short answer, paragraph, multiple choice (radio, type 2),
-checkboxes (type 4), linear scale with min/max labels (type 5),
-multiple-choice grid (type 7, all rows single-select).
+## all-question-types.html / .json
 
-## event-rsvp.html / .json
-https://docs.google.com/forms/d/e/1FAIpQLSfYyu6DOujdBirlNdKv7qvex3kwJh8q_BEtxESoE6vZQaQV2w/viewform
-("Event RSVP" / "Future Options Night 2022")
+https://docs.google.com/forms/d/e/1FAIpQLScXpdCnyzcv0h5_3giJaB9vP_00UIXggzt4UAfMamwPApnINw/viewform
 
-Types present: multiple choice (radio), short answer, checkboxes,
-type-6 informational/title block (no entry array — "if you have further
-questions contact ..." block).
+Public, no sign-in. Captured with `curl -sL -A "Mozilla/5.0" <url>`.
 
-## question-types-demo.html / .json
-https://docs.google.com/forms/d/e/1FAIpQLSciCcNILfeSdgUavm_GYuCFE_G8InD1YVkIWAiTU_B3-l9AkA/viewform
-("Understanding Different Question Types in Google Forms") — the richest
-fixture. Types present: short answer, paragraph, multiple choice, dropdown
-(type 3), checkboxes with a required-count validation rule, checkboxes with
-an "Other" option (option flagged via trailing `1` in the option tuple),
-linear scale with labels, multiple-choice grid AND tick-box/checkbox grid
-(both type 7, distinguished by a trailing `[0]`/`[1]` per-row flag), date
-(type 9, with include-time/include-year flag pair), time (type 10), section
-header/title-description block (type 6, no page break), true section/page
-break (type 8, used to split the form into multiple pages — this form is
-multi-section), video embed (type 12), image embed (type 11). Only
-"File Upload" (type 13) is described in the form's own text but the actual
-question is stated by the form author to be omitted (Shared-Drive/DLP
-restriction) — no live type-13 example was found anywhere in this pass.
+- `.json` is `FB_PUBLIC_LOAD_DATA_` pretty-printed with `JSON.parse`,
+  otherwise untouched.
+- `.html` is the viewform page trimmed to the parts the parser reads: the
+  `FB_PUBLIC_LOAD_DATA_` script and the hidden `fbzx`, `pageHistory`, and
+  `partialResponse` inputs. Everything else Google serves (styles, scripts,
+  script nonce) was dropped.
 
-## ttrpg-applications.html / .json
-https://docs.google.com/forms/d/e/1FAIpQLSfq6m_mqAq406IBKKErxGzzfwdVV6fNMMk2TqFjTQEDkeJaQQ/viewform
-("Applications")
+Four pages. Every item, in order:
 
-Types present: short answer, paragraph, checkboxes with an "Other" option
-(second confirming example of the Other-option flag).
+| Page             | Item                                                         | Type code |
+| ---------------- | ------------------------------------------------------------ | --------- |
+| 1                | Short answer required (required, has description)            | 0         |
+| 1                | Short answer optional (number > 0 validation)                | 0         |
+| 1                | Paragraph question                                           | 1         |
+| 1                | Radio plain (required)                                       | 2         |
+| 1                | Radio with other                                             | 2         |
+| 1                | Dropdown question (required)                                 | 3         |
+| 1                | Checkboxes plain                                             | 4         |
+| 1                | Checkboxes with other                                        | 4         |
+| 1                | Checkboxes with validation (required, select at least 2)     | 4         |
+| 1                | Info block (title/description, no input, no page break)      | 6         |
+| Scales and grids | page break                                                   | 8         |
+| 2                | Scale with labels (1–5, "Bad"/"Great", required)             | 5         |
+| 2                | Scale without labels (0–10)                                  | 5         |
+| 2                | Radio grid (each row required; row flag `[0]`)               | 7         |
+| 2                | Checkbox grid (row flag `[1]`)                               | 7         |
+| 2                | Rating question (5 stars)                                    | 18        |
+| Dates and times  | page break                                                   | 8         |
+| 3                | Date with year (required) — flags `[0,1]`                    | 9         |
+| 3                | Date with year and time — `[1,1]`                            | 9         |
+| 3                | Date without year — `[0,0]`                                  | 9         |
+| 3                | Date with time without year — `[1,0]`                        | 9         |
+| 3                | Time of day — flag `[0]`                                     | 10        |
+| 3                | Duration — flag `[1]`                                        | 10        |
+| Media            | page break                                                   | 8         |
+| 4                | Image item (stock image from the Forms picker)               | 11        |
+| 4                | Video item (a Google Workspace channel video)                | 12        |
 
-## booking-request.html / .json
-https://docs.google.com/forms/d/e/1FAIpQLSeY-Ly53GKeAESPVGnxkNQxXFcJBUFOAKVnmtwKcso3tSf0NA/viewform
-("Booking Request Form")
+Date flags are `[includeTime, includeYear]`.
 
-Types present: date questions (type 9) with the include-time/include-year
-flag pair set to `[0,1]` (no time, has year) — used to cross-check the date
-flag semantics against a second form.
+## file-upload.json
 
-## meeting-room-reservation.html / .json
-https://docs.google.com/forms/d/e/1FAIpQLSeT7JUpxNspz1Fk1lojsMBqd2TDWXFKpf3Ahv1uNY84HSEYeQ/viewform
-("Meeting and Study Room Reservation")
+https://docs.google.com/forms/d/e/1FAIpQLSfREd_C7AwV7IR5sGJjSXoleJi-zXtaSFVPPLyI8hqOb0ILhA/viewform
 
-Types present: date question with `[1,1]` flag pair (include time AND
-year — "Start Day and Time"), separate time-only question (type 10) with
-`[0]` flag. This pair of values (`[1,1]` here vs `[0,1]` in
-booking-request.html) is what confirms the flag order is
-`[includeTime, includeYear]`, not the reverse.
+One required File Upload question (type 13) plus one optional short answer.
+A file-upload question forces sign-in on the whole form, so anonymous `curl`
+gets a 401 and there is no `.html`. The JSON was read from
+`FB_PUBLIC_LOAD_DATA_` in a signed-in browser. One edit: root index 15, a
+per-account font-usage string, was replaced with `"[]"` (the value an
+anonymous capture has).
 
 ## Notes
-- All six forms are single-load, no-signin, `curl -sL` fetchable; none were
-  submitted to.
-- Every fixture's HTML contains hidden inputs `fbzx`, `pageHistory` (always
-  present, value `"0"` on first load even for single-page forms — not
-  exclusive to multi-page forms), and `partialResponse`.
-- `entry.` occurrences found by plain `grep` on the static HTML
-  undercount the true number of fields — many inputs (especially grid rows
-  and later-page questions) are rendered client-side from
-  `FB_PUBLIC_LOAD_DATA_` rather than present as static `<input name="entry...">`
-  tags in the initial HTML. Do not rely on grepping raw HTML for `entry.`
-  ids; parse `FB_PUBLIC_LOAD_DATA_` instead.
+
+- `entry.` occurrences found by plain `grep` on static viewform HTML
+  undercount the true number of fields — grid rows and later-page questions
+  are rendered client-side from `FB_PUBLIC_LOAD_DATA_`. Parse
+  `FB_PUBLIC_LOAD_DATA_` instead.
+- `pageHistory` is present with value `"0"` on first load for every form,
+  not only multi-page ones.

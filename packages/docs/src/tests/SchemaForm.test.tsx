@@ -1,10 +1,10 @@
 import { parseFormData } from "@ez-gform/core";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import questionTypesDemo from "../app/playground/question-types-demo.fixture.json";
-import { SchemaForm } from "./SchemaForm";
+import allQuestionTypes from "../app/playground/all-question-types.fixture.json";
+import { SchemaForm } from "../components/SchemaForm";
 
-const schema = parseFormData(questionTypesDemo);
+const schema = parseFormData(allQuestionTypes);
 
 describe("SchemaForm", () => {
   it("renders a text input for every short_answer/paragraph question", () => {

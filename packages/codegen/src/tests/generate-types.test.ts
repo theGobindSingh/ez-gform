@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { typeCheck } from "./__test-utils__/compile-check.js";
-import { FIXTURE_SLUGS, loadFixtureSchema } from "./__test-utils__/fixtures.js";
-import { generateTypes } from "./generate-types.js";
+import { typeCheck } from "../__test-utils__/compile-check.js";
+import {
+  FIXTURE_SLUGS,
+  loadFixtureSchema,
+} from "../__test-utils__/fixtures.js";
+import { generateTypes } from "../generate-types.js";
 
 describe("generateTypes", () => {
   for (const slug of FIXTURE_SLUGS) {
@@ -24,7 +27,7 @@ describe("generateTypes", () => {
   }
 
   it("marks required questions as non-optional and others as optional", () => {
-    const schema = loadFixtureSchema("event-feedback");
+    const schema = loadFixtureSchema("all-question-types");
     const source = generateTypes(schema);
     for (const question of schema.questions) {
       if (question.type === "file_upload") continue;
@@ -45,7 +48,7 @@ describe("generateTypes", () => {
   });
 
   it("uses a checkboxes-with-other type when the question has an Other option", () => {
-    const schema = loadFixtureSchema("question-types-demo");
+    const schema = loadFixtureSchema("all-question-types");
     const checkboxWithOther = schema.questions.find((q) => {
       return (
         q.type === "checkboxes" &&
@@ -54,6 +57,7 @@ describe("generateTypes", () => {
         })
       );
     });
+    expect(checkboxWithOther).toBeDefined();
     if (!checkboxWithOther) return;
     const source = generateTypes(schema);
     expect(source).toContain(
@@ -64,7 +68,7 @@ describe("generateTypes", () => {
   });
 
   it("uses a provided name", () => {
-    const schema = loadFixtureSchema("event-feedback");
+    const schema = loadFixtureSchema("all-question-types");
     const source = generateTypes(schema, { name: "Custom" });
     expect(source).toContain("export const CustomSchema =");
     expect(source).toContain("export type CustomValues =");

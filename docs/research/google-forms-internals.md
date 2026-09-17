@@ -83,19 +83,16 @@ To parse: strip the `var FB_PUBLIC_LOAD_DATA_ = ` prefix and trailing `;`,
 then `JSON.parse` the remainder (it is a JSON-compatible nested array, not a
 JS object — no keys, purely positional/parallel-array encoded). There is
 **no official schema**. Everything in this section (unless marked
-"unverified") was independently confirmed on 2026-09-16 by fetching six
-live, public, no-signin `/viewform` pages with plain `curl -sL` and
-inspecting the parsed JSON with node — no form was submitted to. Fixtures
-(raw HTML + pretty-printed JSON) are saved alongside this doc's research
-scratchpad; see the fixture README for exactly which question types each
-one contains. Source URLs used for verification:
+"unverified") was confirmed by inspecting the parsed JSON of live forms
+with node — no form was submitted to. The fixtures in
+`packages/core/src/__fixtures__/` are two purpose-built forms owned by this
+project (captured 2026-09-17); see the fixture README for what each
+contains:
 
-- `event-feedback` — https://docs.google.com/forms/d/e/1FAIpQLSeea5PBMuJUpTG9ephwFbt4NApN1TPQi6Yc5cNNw0vgPm9Umw/viewform
-- `event-rsvp` — https://docs.google.com/forms/d/e/1FAIpQLSfYyu6DOujdBirlNdKv7qvex3kwJh8q_BEtxESoE6vZQaQV2w/viewform
-- `question-types-demo` — https://docs.google.com/forms/d/e/1FAIpQLSciCcNILfeSdgUavm_GYuCFE_G8InD1YVkIWAiTU_B3-l9AkA/viewform
-- `ttrpg-applications` — https://docs.google.com/forms/d/e/1FAIpQLSfq6m_mqAq406IBKKErxGzzfwdVV6fNMMk2TqFjTQEDkeJaQQ/viewform
-- `booking-request` — https://docs.google.com/forms/d/e/1FAIpQLSeY-Ly53GKeAESPVGnxkNQxXFcJBUFOAKVnmtwKcso3tSf0NA/viewform
-- `meeting-room-reservation` — https://docs.google.com/forms/d/e/1FAIpQLSeT7JUpxNspz1Fk1lojsMBqd2TDWXFKpf3Ahv1uNY84HSEYeQ/viewform
+- `all-question-types` — public, no sign-in, fetched with plain `curl -sL`.
+- `file-upload` — requires sign-in (any form with a file-upload question
+  does; anonymous `curl` gets a 401), so its JSON was read from a signed-in
+  browser session.
 
 ### Root array (verified)
 
@@ -141,8 +138,8 @@ one contains. Source URLs used for verification:
     `1` when that option is the synthesized "Other" choice (and in that
     case `optionText` is an empty string `""` — Google leaves the display
     text blank client-side since the responder types their own); `0`/absent
-    otherwise. Verified with two independent "Other"-option examples
-    (`question-types-demo` and `ttrpg-applications`). For non-choice
+    otherwise. Verified on both a radio and a checkbox question
+    ("Radio with other", "Checkboxes with other" in `all-question-types`). For non-choice
     questions (short answer, paragraph, date, time) this is `null`.
   - `[4][i][2]` — required flag (`1` = required, `0` = optional).
   - `[4][i][3]` — for a **grid row**, a single-element array holding the
@@ -171,18 +168,18 @@ one contains. Source URLs used for verification:
 | 10   | Time                                                  | see time flag below                                                                                  |
 | 11   | Image block (non-input)                               |                                                                                                      |
 | 12   | Video block (non-input)                               |                                                                                                      |
-| 13   | File upload                                           | **no live example found** in this pass — see caveat below                                            |
+| 13   | File upload                                           | forces sign-in on the whole form — see below                                                         |
+| 18   | Rating (stars/hearts/thumbs)                          | options `"1"`..`"N"`, same wire shape as linear scale                                                |
 
-Not independently found live: **type 13 (file upload)**. One fixture
-(`question-types-demo`) explicitly documents in its own description text
-that it omits a real file-upload question because "File Upload questions
-cannot be used in a Form stored in a Shared Drive... and also cannot be
-used where a domain is enforcing Data Loss Prevention," and the author
-deliberately left it out to keep the form universally fillable. No other
-searched form exposed one either. Type 13's row/option shape is therefore
-still **unverified** — treat it as the community-sourced code (matches the
-original unverified source) but confirm the inner shape before writing a
-parser branch for it.
+**Type 13 (file upload)**, verified in `file-upload`: the sub-question is
+`[entryId, null, requiredFlag]` — no options. Adding one forces sign-in for
+the whole form, so such forms cannot be fetched or submitted anonymously.
+
+**Type 18 (rating)**, verified in `all-question-types`: `[4][0][1]` holds
+option tuples `["1"]`..`["N"]` and the sub-question ends with a
+single-element icon flag array (`[1]` observed for stars). The parser maps
+it to `linear_scale`. That it submits as `entry.N=<number>` is inferred from
+the identical option shape, not observed (no form was submitted to).
 
 ### Grid kind: radio-grid vs checkbox-grid (verified — they ARE distinguishable)
 
@@ -195,58 +192,39 @@ array (last element of each row's descriptor array):
 - `[1]` on a row → that row is multi-select (checkbox-style) — "Tick Box
   Grid."
 
-Verified directly in `question-types-demo.json`: two "Multiple Choice
-Grid" questions have `[0]` on every row, and one "Tick Box Grid" question
-has `[1]` on every row, with the row's own description text confirming
-which UI variant it is ("You can only select one response per row" vs "in
-this one you can select more than one choice per row"). All rows within a
-given grid question shared the same flag in every example seen — i.e. this
-is effectively a per-question, not truly per-row, setting in practice.
+Verified directly in `all-question-types.json`: "Radio grid" has `[0]` on
+every row and "Checkbox grid" has `[1]` on every row. All rows within a
+grid question share the same flag — i.e. this is effectively a
+per-question, not truly per-row, setting in practice.
 
 ### Date question flags (verified)
 
 For a date question (type 9), `[4][0]` carries an extra trailing 2-element
 array at index 7: `[includeTime, includeYear]`, each `0` or `1`.
 
-Verified against three independent examples:
+All four combinations verified in `all-question-types`, each toggled via
+the question's "Include time" / "Include year" menu items:
 
-- `question-types-demo` "Enter your birthday": `[0, 1]` (no time, has
-  year) — plain date-only picker with year shown.
-- `booking-request` "Date Taking Out": `[0, 1]` (no time, has year).
-- `meeting-room-reservation` "Start Day and Time": `[1, 1]` (has time,
-  has year) — confirmed by the question's own title and its distinct
-  "Ending Time" sibling question (a separate type-10 time-only question),
-  which cross-checks that the `1` in the first slot really does mean
-  "this date question also asks for a time," not something else.
-
-No live example with `includeYear = 0` (date without year, e.g. recurring
-birthday/anniversary UI) was found in this pass — the flag's presence and
-first-slot meaning are confirmed, but the "no year" case specifically is
-**unverified** (inferred by exclusion, not directly observed).
+- "Date with year": `[0, 1]`
+- "Date with year and time": `[1, 1]`
+- "Date without year": `[0, 0]`
+- "Date with time without year": `[1, 0]`
 
 ### Time question flag (verified)
 
 For a time question (type 10), `[4][0]` carries a single-element array at
-index 6: `[0]` in both observed examples (`question-types-demo`'s wake-up
-time question and `meeting-room-reservation`'s "Ending Time"). Both are
-described as ordinary time-of-day pickers. A form using the "Duration"
-variant of the time question (hours/minutes/seconds elapsed rather than a
-clock time) was not found live, so whether this flips to `[1]` for
-duration mode is **unverified** — inferred from the field's likely purpose
-but not directly observed.
+index 6: `[0]` for an ordinary time-of-day picker ("Time of day") and
+`[1]` for the "Duration" answer type ("Duration"), both verified in
+`all-question-types`.
 
 ### Section/page breaks (verified)
 
-Type `8` entries are genuine page breaks — `question-types-demo` is a real
-multi-section form (its own description text says so, and its hidden
-`pageHistory` input starts at `"0"` and its type-8 entries carry section
-title/description text in the same `[null, text]` wrapper shape as the
-root title). Type `6` entries look superficially similar (title +
-description, `[4]` null) but are informational blocks that do **not**
-create a new page — confirmed by the form's own text explicitly
-distinguishing the two ("This is a Title and Description block... note
-they are not the same as Sections" for type 6, vs "This is a new section.
-It is used to divide a Form up into separate parts" for type 8).
+Type `8` entries are genuine page breaks — `all-question-types` is a
+four-page form, and its type-8 entries carry section title/description text
+in the same `[null, text]` wrapper shape as the root title. Type `6` entries
+look superficially similar (title + description, `[4]` null) but are
+informational blocks that do **not** create a new page ("Info block" sits
+on page one of that form).
 
 All 6 fixtures' HTML — single-page and multi-page alike — contained hidden
 `<input>`s named `fbzx`, `pageHistory` (value `"0"` on first load), and

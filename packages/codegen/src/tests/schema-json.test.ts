@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { FIXTURE_SLUGS, loadFixtureSchema } from "./__test-utils__/fixtures.js";
-import { generateSchemaJson } from "./schema-json.js";
+import {
+  FIXTURE_SLUGS,
+  loadFixtureSchema,
+} from "../__test-utils__/fixtures.js";
+import { generateSchemaJson } from "../schema-json.js";
 
 describe("generateSchemaJson", () => {
   for (const slug of FIXTURE_SLUGS) {
@@ -13,13 +16,13 @@ describe("generateSchemaJson", () => {
   }
 
   it("pretty-prints by default", () => {
-    const schema = loadFixtureSchema("event-feedback");
+    const schema = loadFixtureSchema("all-question-types");
     const json = generateSchemaJson(schema);
     expect(json).toContain("\n");
   });
 
   it("can be minified", () => {
-    const schema = loadFixtureSchema("event-feedback");
+    const schema = loadFixtureSchema("all-question-types");
     const json = generateSchemaJson(schema, { pretty: false });
     expect(json).not.toContain("\n");
     expect(JSON.parse(json)).toEqual(schema);

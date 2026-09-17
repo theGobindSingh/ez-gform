@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { transpiles, typeCheck } from "./__test-utils__/compile-check.js";
-import { FIXTURE_SLUGS, loadFixtureSchema } from "./__test-utils__/fixtures.js";
-import { generateReactComponent } from "./generate-react.js";
+import { transpiles, typeCheck } from "../__test-utils__/compile-check.js";
+import {
+  FIXTURE_SLUGS,
+  loadFixtureSchema,
+} from "../__test-utils__/fixtures.js";
+import { generateReactComponent } from "../generate-react.js";
 
 describe("generateReactComponent", () => {
   for (const slug of FIXTURE_SLUGS) {
@@ -30,24 +33,19 @@ describe("generateReactComponent", () => {
   }
 
   it("renders a disabled note for file_upload questions", () => {
-    const schema = loadFixtureSchema("question-types-demo");
-    const hasFileUpload = schema.questions.some((q) => {
-      return q.type === "file_upload";
-    });
+    const schema = loadFixtureSchema("file-upload");
     const source = generateReactComponent(schema);
-    if (hasFileUpload) {
-      expect(source).toContain("not supported by Google Forms submission");
-    }
+    expect(source).toContain("not supported by Google Forms submission");
   });
 
   it("respects a provided component name", () => {
-    const schema = loadFixtureSchema("event-feedback");
+    const schema = loadFixtureSchema("all-question-types");
     const source = generateReactComponent(schema, { name: "MyCustomForm" });
     expect(source).toContain("export function MyCustomForm()");
   });
 
   it("emits plain JSX (no type annotations) when typescript is false", () => {
-    const schema = loadFixtureSchema("event-feedback");
+    const schema = loadFixtureSchema("all-question-types");
     const source = generateReactComponent(schema, { typescript: false });
     expect(source).not.toContain("import type { FormSchema }");
     expect(source).not.toContain("satisfies FormSchema");

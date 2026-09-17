@@ -1,25 +1,18 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { ParseError } from "./errors.js";
-import { extractFbzx, extractPublicLoadData } from "./extract.js";
+import { ParseError } from "../errors.js";
+import { extractFbzx, extractPublicLoadData } from "../extract.js";
 
-const fixturesDir = fileURLToPath(new URL("./__fixtures__/", import.meta.url));
+const fixturesDir = fileURLToPath(new URL("../__fixtures__/", import.meta.url));
 
 describe("extractPublicLoadData", () => {
-  it("extracts and JSON.parses the array from question-types-demo.html", () => {
-    const html = readFileSync(`${fixturesDir}question-types-demo.html`, "utf8");
+  it("extracts and JSON.parses the array from all-question-types.html", () => {
+    const html = readFileSync(`${fixturesDir}all-question-types.html`, "utf8");
     const data = extractPublicLoadData(html);
-    expect(Array.isArray(data)).toBe(true);
-    expect((data as unknown[])[3]).toBe(
-      "Understanding Different Question Types",
+    expect(data).toEqual(
+      JSON.parse(readFileSync(`${fixturesDir}all-question-types.json`, "utf8")),
     );
-  });
-
-  it("extracts and JSON.parses the array from event-rsvp.html", () => {
-    const html = readFileSync(`${fixturesDir}event-rsvp.html`, "utf8");
-    const data = extractPublicLoadData(html);
-    expect(Array.isArray(data)).toBe(true);
   });
 
   it("throws ParseError when the marker is absent", () => {
@@ -49,8 +42,8 @@ describe("extractPublicLoadData", () => {
 });
 
 describe("extractFbzx", () => {
-  it("extracts fbzx from event-rsvp.html", () => {
-    const html = readFileSync(`${fixturesDir}event-rsvp.html`, "utf8");
+  it("extracts fbzx from all-question-types.html", () => {
+    const html = readFileSync(`${fixturesDir}all-question-types.html`, "utf8");
     const fbzx = extractFbzx(html);
     expect(fbzx).toBeDefined();
     expect(fbzx?.length).toBeGreaterThan(0);
