@@ -78,6 +78,10 @@ const TYPE_CODE_NAME: Record<
   11: "image",
   12: "video",
   13: "file_upload",
+  // ponytail: rating (stars/hearts) has the same wire shape as a linear scale
+  // (options "1".."N", submits entry.N=<number>), so it reuses that type. Add a
+  // "rating" QuestionType if consumers need to render the icon.
+  18: "linear_scale",
 };
 
 /**
