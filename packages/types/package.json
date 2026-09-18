@@ -1,6 +1,6 @@
 {
   "name": "@ez-gform/types",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Shared TypeScript types for the ez-gform packages (form schema, values, submit, codegen).",
   "type": "module",
   "license": "MIT",

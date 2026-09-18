@@ -1,6 +1,6 @@
 {
   "name": "@ez-gform/codegen",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Pure code generators (JSON schema, TS types, React component, HTML form) from a parsed Google Form schema.",
   "type": "module",
   "license": "MIT",
