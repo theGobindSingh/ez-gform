@@ -13,3 +13,10 @@ coverage/
 .claude/settings.local.json
 next-env.d.ts
 *.tsbuildinfo
+
+# impeccable (third-party design skill): local-only install
+.claude/skills/impeccable/
+.claude/agents/impeccable-*.md
+.github/skills/
+.github/agents/
+.github/hooks/impeccable.json
